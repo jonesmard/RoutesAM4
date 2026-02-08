@@ -127,7 +127,7 @@
                     <p id="stat-active" class="text-2xl font-black text-emerald-500">0</p>
                 </div>
                 <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-blue-600 to-blue-700 p-5 rounded-3xl shadow-xl shadow-blue-500/20">
-                    <p class="text-[9px] uppercase font-black text-blue-100 mb-1">Lucro Estimado</p>
+                    <p class="text-[9px] uppercase font-black text-blue-100 mb-1">Faturamento Estimado</p>
                     <p id="stat-profit" class="text-2xl font-black text-white">$0</p>
                 </div>
             </div>
@@ -263,7 +263,7 @@
                 'tu2412': 'Tupolev Tu-204-120'
             };
             for (const key in mapping) { if (name.includes(key)) return mapping[key]; }
-            return 'Aeronave';
+            return 'Aeronave não identificada';
         }
 
         // Função para formatar dinheiro com K, M, B
@@ -470,8 +470,8 @@
             const h = document.getElementById('filter-origin');
             const airs = ['all', ...new Set(state.routes.map(r => r.aircraft))];
             const hubs = ['all', ...new Set(state.routes.map(r => r.origin))];
-            a.innerHTML = airs.map(x => `<option value="${x}">${x==='all'?'Aeronave':x}</option>`).join('');
-            h.innerHTML = hubs.map(x => `<option value="${x}">${x==='all'?'HUB':x}</option>`).join('');
+            a.innerHTML = airs.map(x => `<option value="${x}">${x==='all'?'Todas as Aeronaves':x}</option>`).join('');
+            h.innerHTML = hubs.map(x => `<option value="${x}">${x==='all'?'Todos os HUBs':x}</option>`).join('');
         }
 
         document.getElementById('search-input').oninput = (e) => { state.filters.s = e.target.value; state.filters.p=1; render(); };
