@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen HUB - Controlo Profissional AM4</title>
+    <title>NexGen HUB - Gestão Profissional AM4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -21,14 +21,14 @@
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen pb-20">
 
     <div id="app">
-        <!-- Overlay Global (Login e Sincronização) -->
+        <!-- Overlay Global -->
         <div id="global-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950 transition-all duration-700">
             <div class="max-w-sm w-full px-8 text-center">
                 <div id="status-ui">
                     <div id="auth-loader" class="inline-block animate-spin text-blue-600 mb-8">
                         <i data-lucide="loader-2" class="w-12 h-12"></i>
                     </div>
-                    <p id="loading-text" class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Sincronizando Malha Aérea...</p>
+                    <p id="loading-text" class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Iniciando Protocolos NexGen...</p>
                 </div>
                 
                 <div id="login-container" class="hidden animate-in fade-in zoom-in duration-500">
@@ -36,16 +36,14 @@
                         <i data-lucide="plane-takeoff" class="text-white w-10 h-10"></i>
                     </div>
                     <h2 class="text-2xl font-black text-white uppercase tracking-tighter mb-2">NexGen HUB</h2>
-                    <p class="text-slate-400 text-[10px] font-bold mb-10 uppercase tracking-[0.3em]">Operações de Voo</p>
-                    
-                    <button id="google-login-btn" class="w-full flex items-center justify-center gap-4 bg-white text-slate-900 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all shadow-xl border-b-4 border-slate-200 btn-active">
+                    <button id="google-login-btn" class="w-full flex items-center justify-center gap-4 bg-white text-slate-900 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all shadow-xl border-b-4 border-slate-200 btn-active mt-8">
                         <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 6.23l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
                         Entrar com Google
                     </button>
                 </div>
 
                 <div id="upload-ui" class="hidden">
-                    <p class="text-white font-black uppercase text-xs tracking-widest animate-pulse mb-4">Gravando Dados no Satélite...</p>
+                    <p class="text-white font-black uppercase text-xs tracking-widest animate-pulse mb-4">Atualizando Malha Global...</p>
                     <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
                         <div id="upload-bar" class="bg-blue-600 h-full w-0 transition-all duration-500"></div>
                     </div>
@@ -60,54 +58,46 @@
                     <i data-lucide="map-pin" class="text-white w-8 h-8"></i>
                 </div>
                 <h3 class="text-xl font-black uppercase tracking-tighter mb-2">Hub de Origem</h3>
-                <p class="text-slate-500 text-xs font-medium mb-6">Identifique o aeroporto de origem para este lote de rotas.</p>
-                <input type="text" id="hub-iata-input" placeholder="EX: JFK" maxlength="3" 
+                <p class="text-slate-500 text-xs font-medium mb-6">Introduza o código IATA de origem para este ficheiro.</p>
+                <input type="text" id="hub-iata-input" placeholder="EX: DXB" maxlength="3" 
                        class="w-full p-4 rounded-2xl bg-slate-100 dark:bg-slate-800 border-none font-black text-center text-3xl uppercase tracking-widest outline-none focus:ring-4 focus:ring-blue-500/20 mb-6">
-                <button id="confirm-hub-btn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all btn-active shadow-lg shadow-blue-500/20">Salvar Malha Aérea</button>
+                <button id="confirm-hub-btn" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all btn-active shadow-lg shadow-blue-500/20">Confirmar Upload</button>
             </div>
         </div>
 
-        <!-- Modal: Gestão de Ficheiros -->
+        <!-- Modal: Gestão de Dados -->
         <div id="manage-modal" class="hidden fixed inset-0 z-[110] modal-overlay flex items-center justify-center p-4">
             <div class="bg-white dark:bg-slate-900 w-full max-w-md rounded-[2.5rem] flex flex-col max-h-[85vh] shadow-2xl animate-in slide-in-from-bottom-4 duration-300 overflow-hidden">
-                <div class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-white dark:bg-slate-900 sticky top-0 z-10">
+                <div class="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-10">
                     <div>
                         <h3 class="text-xl font-black uppercase tracking-tighter">Gestão de Dados</h3>
-                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Histórico de Importações</p>
+                        <p class="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1">Sua Malha Aérea</p>
                     </div>
                     <button onclick="toggleManageModal()" class="p-2 bg-slate-100 dark:bg-slate-800 rounded-full hover:bg-slate-200 transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
                 </div>
-                <div id="uploads-list" class="p-6 overflow-y-auto custom-scrollbar space-y-4 flex-1">
-                    <!-- Lista de ficheiros carregada via JS -->
-                </div>
+                <div id="uploads-list" class="p-6 overflow-y-auto custom-scrollbar space-y-4 flex-1"></div>
                 <div class="p-6 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
                     <button onclick="document.getElementById('csv-upload').click(); toggleManageModal();" class="w-full bg-blue-600 text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 shadow-lg shadow-blue-500/10">
-                        <i data-lucide="plus" class="w-4 h-4"></i> Novo Upload
+                        <i data-lucide="plus" class="w-4 h-4"></i> Novo Lote de Rotas
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Header Principal -->
+        <!-- Header -->
         <header class="sticky top-0 z-50 glass-effect border-b border-slate-200 dark:border-slate-800 px-4 py-3">
             <div class="max-w-7xl mx-auto flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="bg-blue-600 p-2 rounded-xl shadow-lg"><i data-lucide="plane" class="text-white w-5 h-5"></i></div>
-                    <div>
-                        <h1 class="text-sm font-black uppercase tracking-tighter leading-none">NEXGEN <span class="text-blue-600">HUB</span></h1>
-                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Console v1.0</p>
-                    </div>
+                    <h1 class="text-sm font-black uppercase tracking-tighter">NEXGEN <span class="text-blue-600">HUB</span></h1>
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <!-- Botão de Gestão de Arquivos Principal -->
-                    <button onclick="toggleManageModal()" class="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-3 py-2.5 rounded-xl btn-active border border-blue-100 dark:border-blue-900/30">
+                    <button onclick="toggleManageModal()" class="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-4 py-2.5 rounded-xl btn-active border border-blue-100 dark:border-blue-900/30">
                         <i data-lucide="database" class="w-4 h-4"></i>
-                        <span class="text-[10px] font-black uppercase hidden sm:inline">Meus Dados</span>
+                        <span class="text-[10px] font-black uppercase hidden sm:inline">Dados</span>
                     </button>
-
                     <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
-                    
                     <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 pr-3 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-200 transition-all">
                         <img id="user-photo" src="" class="w-7 h-7 rounded-full bg-slate-300" onerror="this.src='https://ui-avatars.com/api/?name=Pilot&background=3b82f6&color=fff'">
                         <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
@@ -115,11 +105,10 @@
                 </div>
             </div>
 
-            <!-- Menu User -->
             <div id="user-menu" class="hidden absolute right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-2 animate-in slide-in-from-top-2">
                 <p id="user-display-name" class="p-3 text-[10px] font-black uppercase border-b border-slate-100 dark:border-slate-800 mb-1"></p>
                 <button onclick="logout()" class="w-full flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all font-bold text-xs uppercase tracking-widest">
-                    <i data-lucide="log-out" class="w-4 h-4"></i> Encerrar Sessão
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Logout
                 </button>
             </div>
         </header>
@@ -137,14 +126,14 @@
                     <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Operacionais</p>
                     <p id="stat-active" class="text-2xl font-black text-emerald-500">0</p>
                 </div>
-                <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-blue-600 to-blue-700 p-5 rounded-3xl shadow-xl">
+                <div class="col-span-2 sm:col-span-1 bg-blue-600 p-5 rounded-3xl shadow-xl shadow-blue-500/20">
                     <p class="text-[9px] uppercase font-black text-blue-100 mb-1">Lucro Estimado</p>
                     <p id="stat-profit" class="text-2xl font-black text-white">$0</p>
                 </div>
             </div>
 
-            <!-- Painel de Filtros -->
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-slate-200 dark:border-slate-800 mb-10 space-y-4 shadow-sm">
+            <!-- Filtros -->
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 mb-10 space-y-4 shadow-sm">
                 <div class="relative">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
                     <input type="text" id="search-input" placeholder="Pesquisar Destino ou IATA..." 
@@ -166,20 +155,14 @@
                 </div>
             </div>
 
-            <!-- Grelha de Rotas -->
             <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-500"></div>
 
-            <!-- Empty State -->
             <div id="empty-state" class="hidden flex flex-col items-center justify-center py-40 text-center opacity-50">
-                <div class="bg-slate-200 dark:bg-slate-800 w-20 h-20 rounded-full flex items-center justify-center mb-6">
-                    <i data-lucide="cloud-off" class="w-10 h-10"></i>
-                </div>
-                <h3 class="font-black uppercase text-sm tracking-widest text-slate-400">Sem Malha Aérea</h3>
-                <p class="text-[10px] mt-2 max-w-[220px]">Adicione um ficheiro CSV e defina o seu HUB de origem para começar.</p>
-                <button onclick="document.getElementById('csv-upload').click()" class="mt-8 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all btn-active">Carregar CSV</button>
+                <i data-lucide="cloud-off" class="w-12 h-12 mb-4"></i>
+                <h3 class="font-black uppercase text-sm">Sem Rotas</h3>
+                <button onclick="document.getElementById('csv-upload').click()" class="mt-8 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all btn-active">Começar Importação</button>
             </div>
 
-            <!-- Paginação -->
             <div id="pagination-box" class="hidden flex items-center justify-between mt-12 p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
                 <button id="prev-btn" class="p-3 disabled:opacity-20 transition-all bg-slate-50 dark:bg-slate-800 rounded-xl"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
                 <p id="page-text" class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Página 1 / 1</p>
@@ -192,7 +175,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         const config = {
             apiKey: "AIzaSyBA9SPhouEHpLCbelK5sMOIGCTI8qsdWuQ",
@@ -204,17 +187,10 @@
             measurementId: "G-Z6HP2BYZ44"
         };
 
-        const appId = "nexgen_hub_v10";
+        const appId = "nexgen_hub_v11_hybrid";
         let app, auth, db, provider;
-        let state = { 
-            user: null, 
-            uploads: [], 
-            routes: [], 
-            status: {}, 
-            filters: { s: "", a: "all", h: "all", st: "all", p: 1, l: 100 } 
-        };
-
-        let tempUpload = { fileName: "", list: [] };
+        let state = { user: null, uploads: [], routes: [], status: {}, filters: { s: "", a: "all", h: "all", st: "all", p: 1, l: 100 } };
+        let tempUpload = { fileName: "", list: [], type: "passenger" };
 
         try {
             app = initializeApp(config);
@@ -245,18 +221,14 @@
         });
 
         function sync(uid) {
-            const uploadsRef = collection(db, 'artifacts', appId, 'users', uid, 'uploads');
-            const sRef = doc(db, 'artifacts', appId, 'users', uid, 'status', 'active');
-
-            onSnapshot(uploadsRef, (snap) => {
+            onSnapshot(collection(db, 'artifacts', appId, 'users', uid, 'uploads'), (snap) => {
                 state.uploads = snap.docs.map(d => ({ docId: d.id, ...d.data() }));
                 state.routes = state.uploads.reduce((acc, curr) => acc.concat(curr.list || []), []);
                 updateOpts();
                 render();
                 renderUploadsList();
             });
-
-            onSnapshot(sRef, (snap) => {
+            onSnapshot(doc(db, 'artifacts', appId, 'users', uid, 'status', 'active'), (snap) => {
                 state.status = snap.exists() ? (snap.data().active || {}) : {};
                 render();
             });
@@ -270,35 +242,44 @@
             reader.onload = async (ev) => {
                 try {
                     const lines = ev.target.result.split(/\r?\n/).filter(l => l.trim());
-                    const headers = lines[0].split(',').map(h => h.trim());
+                    const headers = lines[0].split(',').map(h => h.trim().replace(/"/g, ''));
+                    
+                    // Detecção Inteligente de Tipo (Passageiro ou Cargo)
+                    const isCargo = headers.includes('cfg.l') || headers.includes('dem.l');
+                    const fileType = isCargo ? "cargo" : "passenger";
+
                     const list = lines.slice(1).map((line, idx) => {
-                        const vals = line.split(',');
-                        const o = {}; headers.forEach((h, i) => o[h] = vals[i] || ""); 
+                        const vals = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); // Regex para lidar com vírgulas em aspas
+                        const o = {}; 
+                        headers.forEach((h, i) => o[h] = vals[i] ? vals[i].replace(/"/g, '').trim() : ""); 
+                        
                         return {
                             id: o['dest.id'] || `R-${idx}-${Date.now()}`,
                             name: o['dest.name'] || 'Aeroporto',
                             iata: o['dest.iata'] || '???',
                             country: o['dest.country'] || '-',
-                            dist: parseFloat(o['direct_dist']) || 0,
+                            dist: parseFloat(o['direct_dist']) || parseFloat(o['full_dist']) || 0,
                             time: parseFloat(o['time']) || 0,
                             profit: parseFloat(o['profit_pt']) || 0,
-                            aircraft: file.name.toLowerCase().includes('mc214') ? 'MC-21-400' : 'Aeronave',
-                            config: { y: o['cfg.y'] || 0, j: o['cfg.j'] || 0, f: o['cfg.f'] || 0 },
-                            prices: { y: o['tkt.y'] || 0, j: o['tkt.j'] || 0, f: o['tkt.f'] || 0 },
-                            stopover: o['stop.iata'] ? { name: o['stop.name'], iata: o['stop.iata'] } : null
+                            aircraft: file.name.toLowerCase().includes('mc214') ? 'MC-21-400' : (file.name.toLowerCase().includes('b748') ? 'B747-8F' : 'Aeronave'),
+                            type: fileType,
+                            config: isCargo ? { l: o['cfg.l'] || 0, h: o['cfg.h'] || 0 } : { y: o['cfg.y'] || 0, j: o['cfg.j'] || 0, f: o['cfg.f'] || 0 },
+                            prices: isCargo ? { l: o['tkt.l'] || 0, h: o['tkt.h'] || 0 } : { y: o['tkt.y'] || 0, j: o['tkt.j'] || 0, f: o['tkt.f'] || 0 },
+                            stopover: o['stop.iata'] ? { name: o['stop.name'] || "Escala", iata: o['stop.iata'] } : null
                         };
                     });
-                    tempUpload = { fileName: file.name, list };
+
+                    tempUpload = { fileName: file.name, list, type: fileType };
                     document.getElementById('hub-modal').classList.remove('hidden');
                     document.getElementById('hub-iata-input').focus();
-                } catch (err) { alert("Falha ao ler CSV."); }
+                } catch (err) { alert("Erro de Processamento. Verifique o formato do CSV."); }
             };
             reader.readAsText(file);
         };
 
         document.getElementById('confirm-hub-btn').onclick = async () => {
             const hubIata = document.getElementById('hub-iata-input').value.toUpperCase().trim();
-            if (hubIata.length < 3) return alert("IATA inválido.");
+            if (hubIata.length < 3) return alert("Código IATA Inválido.");
 
             document.getElementById('hub-modal').classList.add('hidden');
             document.getElementById('global-overlay').classList.remove('opacity-0', 'pointer-events-none');
@@ -309,12 +290,9 @@
 
             try {
                 const finalRoutes = tempUpload.list.map(r => ({ ...r, origin: hubIata }));
-                const docId = `upload_${Date.now()}`;
+                const docId = `up_${Date.now()}`;
                 await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'uploads', docId), {
-                    fileName: tempUpload.fileName,
-                    hub: hubIata,
-                    date: new Date().toISOString(),
-                    list: finalRoutes
+                    fileName: tempUpload.fileName, hub: hubIata, date: new Date().toISOString(), list: finalRoutes, type: tempUpload.type
                 });
                 bar.style.width = '100%';
                 setTimeout(() => {
@@ -322,34 +300,30 @@
                     document.getElementById('upload-ui').classList.add('hidden');
                     document.getElementById('hub-iata-input').value = "";
                 }, 800);
-            } catch (err) { alert("Erro de escrita."); }
+            } catch (err) { alert("Falha na gravação."); }
         };
 
-        async function deleteUpload(docId) {
-            if(!confirm("Deseja apagar este conjunto de rotas?")) return;
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'uploads', docId));
-            } catch (e) { alert("Erro ao apagar."); }
-        }
-        window.deleteUpload = deleteUpload;
+        window.deleteUpload = async (docId) => {
+            if(!confirm("Remover este lote de rotas permanentemente?")) return;
+            await deleteDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'uploads', docId));
+        };
 
         function renderUploadsList() {
             const container = document.getElementById('uploads-list');
-            container.innerHTML = state.uploads.length === 0 ? '<p class="text-center text-slate-400 py-10 text-[10px] font-black uppercase tracking-widest">Sem Histórico</p>' : '';
+            container.innerHTML = state.uploads.length === 0 ? '<p class="text-center text-slate-400 py-10 text-[10px] font-black uppercase">Vazio</p>' : '';
             state.uploads.forEach(up => {
                 const div = document.createElement('div');
-                div.className = "p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center animate-in fade-in";
+                div.className = "p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center";
                 div.innerHTML = `
                     <div class="min-w-0 flex-1 pr-4">
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="bg-blue-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded leading-none uppercase">${up.hub}</span>
-                            <p class="text-xs font-black truncate text-slate-900 dark:text-white">${up.fileName}</p>
+                            <span class="bg-blue-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">${up.hub}</span>
+                            <span class="text-[8px] font-black uppercase ${up.type === 'cargo' ? 'text-amber-500' : 'text-emerald-500'}">[${up.type}]</span>
+                            <p class="text-xs font-black truncate">${up.fileName}</p>
                         </div>
-                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-tighter">${up.list.length} Rotas • ${new Date(up.date).toLocaleDateString()}</p>
+                        <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${up.list.length} Rotas • ${new Date(up.date).toLocaleDateString()}</p>
                     </div>
-                    <button onclick="deleteUpload('${up.docId}')" class="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
-                        <i data-lucide="trash-2" class="w-4 h-4"></i>
-                    </button>
+                    <button onclick="deleteUpload('${up.docId}')" class="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                 `;
                 container.appendChild(div);
             });
@@ -374,49 +348,56 @@
                 document.getElementById('empty-state').classList.add('hidden');
                 paginated.forEach(r => {
                     const isUsed = state.status[r.id];
+                    const isCargo = r.type === 'cargo';
                     const card = document.createElement('div');
-                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5 shadow-xl' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`;
+                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`;
+                    
+                    const classesHtml = isCargo ? `
+                        <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5">
+                            <span class="opacity-70 italic text-amber-500">Carga Large</span>
+                            <span class="font-black">${r.config.l} kg @ $${r.prices.l}</span>
+                        </div>
+                        <div class="flex justify-between font-bold">
+                            <span class="opacity-70 italic text-amber-600">Carga Heavy</span>
+                            <span class="font-black">${r.config.h} kg @ $${r.prices.h}</span>
+                        </div>
+                    ` : `
+                        <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5"><span class="opacity-70 italic text-blue-500">Classe Y</span><span class="font-black">${r.config.y} pax @ $${r.prices.y}</span></div>
+                        <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5"><span class="opacity-70 italic text-indigo-500">Classe J</span><span class="font-black">${r.config.j} pax @ $${r.prices.j}</span></div>
+                        <div class="flex justify-between font-bold"><span class="opacity-70 italic text-purple-500">Classe F</span><span class="font-black">${r.config.f} pax @ $${r.prices.f}</span></div>
+                    `;
+
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex items-center gap-1.5 font-black text-[8px]">
                                 <span class="bg-blue-600 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.origin}</span>
                                 <i data-lucide="arrow-right" class="w-3 h-3 opacity-30"></i>
                                 <span class="bg-emerald-600 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.iata}</span>
+                                ${isCargo ? '<span class="bg-amber-500 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">CARGO</span>' : ''}
                             </div>
                             ${isUsed ? '<span class="text-[8px] font-black text-emerald-600 uppercase bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full">Ativo</span>' : ''}
                         </div>
-                        <h3 class="font-black text-lg truncate mb-1 leading-tight text-slate-800 dark:text-white">${r.name}</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-5 tracking-tighter">${r.country} • ${r.aircraft}</p>
+                        <h3 class="font-black text-lg truncate mb-1 leading-tight">${r.name}</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-5">${r.country} • ${r.aircraft}</p>
                         <div class="grid grid-cols-3 gap-2 mb-6 text-center">
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
                                 <span class="text-[11px] font-black block">${Math.round(r.dist)}km</span>
-                                <span class="text-[7px] text-slate-400 uppercase font-black tracking-tighter">Dist</span>
+                                <span class="text-[7px] text-slate-400 uppercase font-black">Dist</span>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
-                                <span class="text-[11px] font-black block text-emerald-600">$${Math.round(r.profit/1000)}k</span>
-                                <span class="text-[7px] text-slate-400 uppercase font-black tracking-tighter">Lucro</span>
+                                <span class="text-[11px] font-black text-emerald-600 block">$${Math.round(r.profit/1000)}k</span>
+                                <span class="text-[7px] text-slate-400 uppercase font-black">Lucro</span>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
                                 <span class="text-[11px] font-black block">${Math.floor(r.time)}h</span>
-                                <span class="text-[7px] text-slate-400 uppercase font-black tracking-tighter">Voo</span>
+                                <span class="text-[7px] text-slate-400 uppercase font-black">Voo</span>
                             </div>
                         </div>
-                        <div class="bg-blue-600/5 dark:bg-blue-600/10 p-4 rounded-[1.5rem] border border-blue-600/10 mb-6 text-[10px] space-y-2">
-                            <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5">
-                                <span class="opacity-70 italic">Classe Y</span>
-                                <span class="font-black">${r.config.y} pax @ $${r.prices.y}</span>
-                            </div>
-                            <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5">
-                                <span class="opacity-70 italic">Classe J</span>
-                                <span class="font-black">${r.config.j} pax @ $${r.prices.j}</span>
-                            </div>
-                            <div class="flex justify-between font-bold">
-                                <span class="opacity-70 italic">Classe F</span>
-                                <span class="font-black">${r.config.f} pax @ $${r.prices.f}</span>
-                            </div>
+                        <div class="bg-blue-600/5 dark:bg-blue-600/10 p-4 rounded-[1.8rem] border border-blue-600/10 mb-6 text-[10px] space-y-1.5">
+                            ${classesHtml}
                         </div>
                         <button class="use-btn w-full py-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all btn-active ${isUsed ? 'bg-slate-900 text-white shadow-xl' : 'bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white'} shadow-sm">
-                            ${isUsed ? 'Liberar Rota' : 'Iniciar Voo'}
+                            ${isUsed ? 'Liberar Aeronave' : 'Iniciar Rota'}
                         </button>
                     `;
                     card.querySelector('.use-btn').onclick = async () => {
@@ -451,7 +432,7 @@
             const airs = ['all', ...new Set(state.routes.map(r => r.aircraft))];
             const hubs = ['all', ...new Set(state.routes.map(r => r.origin))];
             a.innerHTML = airs.map(x => `<option value="${x}">${x==='all'?'Aeronave':x}</option>`).join('');
-            h.innerHTML = hubs.map(x => `<option value="${x}">${x==='all'?'HUB':x}</option>`).join('');
+            h.innerHTML = hubs.map(x => `<option value="${x}">${x==='all'?'Origem (HUB)':x}</option>`).join('');
         }
 
         document.getElementById('search-input').oninput = (e) => { state.filters.s = e.target.value; state.filters.p=1; render(); };
