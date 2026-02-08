@@ -263,6 +263,20 @@
             });
         }
 
+        // Função para detetar a aeronave baseada no código ICAO/IATA comum no nome do ficheiro
+        function detectAircraft(fileName) {
+            const name = fileName.toLowerCase();
+            if (name.includes('mc214')) return 'MC-21-400';
+            if (name.includes('a388')) return 'A380-800';
+            if (name.includes('b748')) return name.includes('f') ? 'B747-8F' : 'B747-8';
+            if (name.includes('a359')) return 'A350-900';
+            if (name.includes('b77w')) return 'B777-300ER';
+            if (name.includes('a320')) return 'A320-200';
+            if (name.includes('b738')) return 'B737-800';
+            if (name.includes('a321')) return 'A321-200';
+            return 'Aeronave';
+        }
+
         window.processCSV = async (e) => {
             const file = e.target.files[0];
             if (!file || !state.user) return;
@@ -275,6 +289,7 @@
                     
                     const isCargo = headers.includes('cfg.l') || headers.includes('dem.l');
                     const fileType = isCargo ? "cargo" : "passenger";
+                    const detectedAircraft = detectAircraft(file.name);
 
                     const list = lines.slice(1).map((line, idx) => {
                         const vals = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
@@ -292,7 +307,7 @@
                             dist: parseFloat(o['direct_dist']) || parseFloat(o['full_dist']) || 0,
                             time: parseFloat(o['time']) || 0,
                             profit: parseFloat(o['profit_pt']) || 0,
-                            aircraft: file.name.toLowerCase().includes('mc214') ? 'MC-21-400' : (file.name.toLowerCase().includes('b748') ? 'B747-8F' : 'Aeronave'),
+                            aircraft: detectedAircraft,
                             type: fileType,
                             config: isCargo ? { l: o['cfg.l'] || "0", h: o['cfg.h'] || "0" } : { y: o['cfg.y'] || "0", j: o['cfg.j'] || "0", f: o['cfg.f'] || "0" },
                             prices: isCargo ? { l: o['tkt.l'] || "0", h: o['tkt.h'] || "0" } : { y: o['tkt.y'] || "0", j: o['tkt.j'] || "0", f: o['tkt.f'] || "0" },
