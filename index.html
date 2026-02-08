@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen HUB - Gestão de Rotas</title>
+    <title>NexGena HUB - Gestão de Rotas</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -25,7 +25,7 @@
                 <div class="inline-block animate-spin text-blue-600 mb-4">
                     <i data-lucide="loader-2" class="w-12 h-12"></i>
                 </div>
-                <p class="font-black text-slate-400 uppercase tracking-widest text-sm">A Carregar HUB...</p>
+                <p id="loading-text" class="font-black text-slate-400 uppercase tracking-widest text-sm">A Carregar HUB...</p>
             </div>
         </div>
 
@@ -142,15 +142,40 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Variáveis Globais de Ambiente
-        const firebaseConfig = JSON.parse(__firebase_config);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // ==========================================================
+        // CONFIGURAÇÃO DO SEU FIREBASE (SUBSTITUA PELO SEU)
+        // ==========================================================
+        // Vá ao console do Firebase -> Configurações do Projeto -> Seus Aplicativos -> SDK Setup
+        let firebaseConfig = {
+            apiKey: "",
+            authDomain: "",
+            projectId: "",
+            storageBucket: "",
+            messagingSenderId: "",
+            appId: ""
+        };
+
+        // Fallback para o ambiente de execução do Canvas (não apague)
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch(e) {}
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'nexgen-hub-v1';
         const initialToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         // Init Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch(e) {
+            console.error("Firebase falhou ao iniciar. Verifique sua config.", e);
+            document.getElementById('loading-text').innerText = "Erro ao conectar ao Firebase. Verifique a configuração no código.";
+            setTimeout(() => document.getElementById('loading-screen').classList.add('hidden'), 3000);
+        }
 
         // Estado da App
         let state = {
@@ -170,6 +195,7 @@
 
         // --- AUTH ---
         async function initAuth() {
+            if (!auth) return;
             try {
                 if (initialToken) {
                     await signInWithCustomToken(auth, initialToken);
@@ -190,6 +216,7 @@
 
         // --- FIRESTORE ---
         function setupFirestoreListeners(uid) {
+            if (!db) return;
             const routesRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'routes');
             const statusRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'status');
 
@@ -198,6 +225,9 @@
                 document.getElementById('loading-screen').classList.add('hidden');
                 updateFiltersOptions();
                 render();
+            }, (err) => {
+                console.error("Erro ao ler rotas:", err);
+                document.getElementById('loading-screen').classList.add('hidden');
             });
 
             onSnapshot(statusRef, (docSnap) => {
@@ -207,13 +237,13 @@
         }
 
         async function saveRoutesToCloud(list) {
-            if (!state.user) return;
+            if (!state.user || !db) return;
             const ref = doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'routes');
             await setDoc(ref, { list });
         }
 
         async function toggleRouteUse(routeId) {
-            if (!state.user) return;
+            if (!state.user || !db) return;
             const newStatus = { ...state.inUseRoutes, [routeId]: !state.inUseRoutes[routeId] };
             const ref = doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'status');
             await setDoc(ref, { active: newStatus });
