@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen HUB - Gestão Profissional AM4</title>
+    <title>NexGen HUB - Controlo Profissional AM4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -14,21 +14,25 @@
         .glass-effect { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); }
         .dark .glass-effect { background: rgba(15, 23, 42, 0.9); }
         .btn-active:active { transform: scale(0.95); }
+        #global-overlay { z-index: 9999; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen pb-20">
 
     <div id="app">
-        <!-- Overlay de Login e Avisos -->
-        <div id="global-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950 transition-all duration-700">
+        <!-- Overlay Global (Login e Avisos) -->
+        <div id="global-overlay" class="fixed inset-0 flex items-center justify-center bg-slate-950 transition-all duration-500">
             <div class="max-w-sm w-full px-8 text-center">
+                
+                <!-- Interface de Carregamento Ativo -->
                 <div id="status-ui">
                     <div id="auth-loader" class="inline-block animate-spin text-blue-600 mb-8">
                         <i data-lucide="loader-2" class="w-12 h-12"></i>
                     </div>
-                    <p id="loading-text" class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Iniciando NexGen Hub...</p>
+                    <p id="loading-text" class="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">Iniciando Protocolos NexGen...</p>
                 </div>
                 
+                <!-- Contentor de Login (Escondido por padrão) -->
                 <div id="login-container" class="hidden animate-in fade-in zoom-in duration-500">
                     <div class="bg-gradient-to-br from-blue-600 to-indigo-700 w-20 h-20 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-500/20">
                         <i data-lucide="plane-takeoff" class="text-white w-10 h-10"></i>
@@ -42,6 +46,7 @@
                     </button>
                 </div>
 
+                <!-- Interface de Progresso de Upload -->
                 <div id="upload-ui" class="hidden">
                     <p class="text-white font-black uppercase text-xs tracking-widest animate-pulse mb-4">Sincronizando Malha...</p>
                     <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
@@ -49,10 +54,12 @@
                     </div>
                 </div>
 
-                <!-- Botão de Emergência para quando a tela trava -->
-                <div id="emergency-ui" class="hidden mt-12 animate-in fade-in duration-1000">
-                    <p class="text-red-500 text-[9px] font-mono mb-4 uppercase tracking-widest">O sistema está demorando a responder</p>
-                    <button onclick="location.reload()" class="bg-slate-800 text-white px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700">Tentar Recarregar</button>
+                <!-- Mensagens de Erro Crítico -->
+                <div id="emergency-ui" class="hidden mt-12 animate-in fade-in duration-500">
+                    <div class="bg-red-500/10 border border-red-500/20 p-4 rounded-2xl mb-4">
+                        <p id="error-desc" class="text-red-500 text-[10px] font-mono uppercase tracking-widest">O servidor não respondeu</p>
+                    </div>
+                    <button onclick="location.reload()" class="bg-slate-800 text-white px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border border-slate-700 active:scale-95 transition-all">Forçar Recarregamento</button>
                 </div>
             </div>
         </div>
@@ -66,22 +73,22 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <button onclick="document.getElementById('csv-upload').click()" class="bg-blue-600 text-white p-2.5 rounded-xl btn-active shadow-lg shadow-blue-500/20 transition-all">
+                    <button onclick="document.getElementById('csv-upload').click()" class="bg-blue-600 text-white p-2.5 rounded-xl btn-active shadow-lg shadow-blue-500/20">
                         <i data-lucide="plus" class="w-5 h-5"></i>
                     </button>
                     <input type="file" id="csv-upload" accept=".csv" class="hidden" onchange="window.processCSV(event)">
                     <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
                     <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 pr-3 rounded-full border border-slate-200 dark:border-slate-700">
-                        <img id="user-photo" src="" class="w-7 h-7 rounded-full bg-slate-300 shadow-inner">
+                        <img id="user-photo" src="" class="w-7 h-7 rounded-full bg-slate-300 shadow-inner" onerror="this.src='https://ui-avatars.com/api/?name=Pilot&background=3b82f6&color=fff'">
                         <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
                     </button>
                 </div>
             </div>
 
             <div id="user-menu" class="hidden absolute right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-2 animate-in slide-in-from-top-2">
-                <p id="user-display-name" class="p-3 text-[10px] font-black uppercase border-b border-slate-100 dark:border-slate-800 mb-1"></p>
+                <p id="user-display-name" class="p-3 text-[10px] font-black uppercase border-b border-slate-100 dark:border-slate-800 mb-1">NexGen Pilot</p>
                 <button onclick="logout()" class="w-full flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all font-bold text-xs uppercase tracking-widest">
-                    <i data-lucide="log-out" class="w-4 h-4"></i> Sair da Conta
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Sair
                 </button>
             </div>
         </header>
@@ -89,11 +96,11 @@
         <main class="max-w-7xl mx-auto px-4 py-6">
             <!-- Estatísticas -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
                     <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Rotas Salvas</p>
                     <p id="stat-count" class="text-2xl font-black">0</p>
                 </div>
-                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
                     <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Ativas</p>
                     <p id="stat-active" class="text-2xl font-black text-emerald-500">0</p>
                 </div>
@@ -147,16 +154,9 @@
         </main>
     </div>
 
-    <!-- Firebase SDK (Version Stable 11.1.0) -->
+    <!-- Firebase SDK (Modular & Stable) -->
     <script type="module">
-        console.log("✈️ NexGen HUB: Iniciando protocolos de comunicação...");
-        
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-
-        // CONFIGURAÇÃO DO UTILIZADOR
-        const firebaseConfig = {
+        const config = {
             apiKey: "AIzaSyBA9SPhouEHpLCbelK5sMOIGCTI8qsdWuQ",
             authDomain: "nextgen-hub-399b2.firebaseapp.com",
             projectId: "nextgen-hub-399b2",
@@ -166,47 +166,53 @@
             measurementId: "G-Z6HP2BYZ44"
         };
 
-        const appId = "nexgen_system_v7_final";
-        let app, auth, db, provider;
-        let state = {
-            user: null, routes: [], status: {},
-            filters: { s: "", a: "all", st: "all", o: "profit", p: 1, l: 100 }
-        };
+        // Fallback de Emergência (Se após 4s nada acontecer, mostra o Login)
+        const safetyTimer = setTimeout(() => {
+            const overlay = document.getElementById('global-overlay');
+            if (overlay && !overlay.classList.contains('opacity-0')) {
+                document.getElementById('status-ui').classList.add('hidden');
+                document.getElementById('login-container').classList.remove('hidden');
+                document.getElementById('emergency-ui').classList.remove('hidden');
+                document.getElementById('error-desc').innerText = "Ligação lenta ou bloqueada por extensões.";
+            }
+        }, 4000);
 
-        // Prevenção de tela travada
-        setTimeout(() => {
-            const ui = document.getElementById('emergency-ui');
-            if (ui && !state.user) ui.classList.remove('hidden');
-        }, 6000);
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+
+        let app, auth, db, provider;
+        let state = { user: null, routes: [], status: {}, filters: { s: "", a: "all", st: "all", o: "profit", p: 1, l: 100 } };
 
         try {
-            app = initializeApp(firebaseConfig);
+            app = initializeApp(config);
             auth = getAuth(app);
             db = getFirestore(app);
             provider = new GoogleAuthProvider();
-            console.log("✅ Conexão estabelecida.");
+            console.log("✈️ Firebase: Sistemas Prontos.");
         } catch (e) {
-            console.error("❌ Erro Inicial:", e);
-            document.getElementById('loading-text').innerText = "Erro Crítico de Ligação";
+            console.error("❌ Firebase Crash:", e);
+            document.getElementById('error-desc').innerText = "Erro ao carregar banco de dados.";
+            document.getElementById('emergency-ui').classList.remove('hidden');
         }
 
-        // --- AUTH ---
+        // Funções Globais
         window.logout = () => signOut(auth).then(() => location.reload());
         window.toggleUserMenu = () => document.getElementById('user-menu').classList.toggle('hidden');
 
+        // Login Google
         document.getElementById('google-login-btn').onclick = async () => {
-            console.log("🔑 Abrindo popup Google...");
             try {
                 await signInWithPopup(auth, provider);
             } catch (err) {
-                console.error("❌ Erro Login:", err);
-                alert("Erro ao entrar: " + err.message);
+                alert("Erro no Login: " + err.message);
             }
         };
 
+        // Observador de Autenticação
         onAuthStateChanged(auth, (user) => {
+            clearTimeout(safetyTimer);
             if (user) {
-                console.log("👤 Bem-vindo,", user.displayName);
                 state.user = user;
                 document.getElementById('global-overlay').classList.add('opacity-0', 'pointer-events-none');
                 document.getElementById('user-photo').src = user.photoURL || '';
@@ -215,32 +221,32 @@
             } else {
                 document.getElementById('status-ui').classList.add('hidden');
                 document.getElementById('login-container').classList.remove('hidden');
+                document.getElementById('emergency-ui').classList.add('hidden');
             }
         });
 
-        // --- DATA SYNC ---
+        // Sincronismo Cloud
         function sync(uid) {
-            const rRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'routes');
-            const sRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'status');
+            const rRef = doc(db, 'artifacts', 'nexgen_hub_v8', 'users', uid, 'data', 'routes');
+            const sRef = doc(db, 'artifacts', 'nexgen_hub_v8', 'users', uid, 'data', 'status');
 
             onSnapshot(rRef, (snap) => {
                 state.routes = snap.exists() ? (snap.data().list || []) : [];
                 updateOpts();
                 render();
-            }, (err) => console.error("Erro Firestore Rotas:", err));
+            });
 
             onSnapshot(sRef, (snap) => {
                 state.status = snap.exists() ? (snap.data().active || {}) : {};
                 render();
-            }, (err) => console.error("Erro Firestore Status:", err));
+            });
         }
 
-        // --- CSV PROCESSOR ---
+        // Processador de CSV
         window.processCSV = async (e) => {
             const file = e.target.files[0];
             if (!file || !state.user) return;
 
-            console.log("📤 Processando malha aérea...");
             document.getElementById('global-overlay').classList.remove('opacity-0', 'pointer-events-none');
             document.getElementById('login-container').classList.add('hidden');
             document.getElementById('upload-ui').classList.remove('hidden');
@@ -248,10 +254,7 @@
             const reader = new FileReader();
             reader.onload = async (ev) => {
                 try {
-                    const text = ev.target.result;
-                    const lines = text.split(/\r?\n/).filter(l => l.trim());
-                    if (lines.length < 2) throw new Error("Arquivo vazio.");
-
+                    const lines = ev.target.result.split(/\r?\n/).filter(l => l.trim());
                     const headers = lines[0].split(',').map(h => h.trim());
                     const bar = document.getElementById('upload-bar');
                     
@@ -276,31 +279,23 @@
                         };
                     });
 
-                    bar.style.width = '60%';
-                    await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'routes'), { list: newList });
+                    bar.style.width = '70%';
+                    await setDoc(doc(db, 'artifacts', 'nexgen_hub_v8', 'users', state.user.uid, 'data', 'routes'), { list: newList });
                     
                     bar.style.width = '100%';
                     setTimeout(() => {
                         document.getElementById('global-overlay').classList.add('opacity-0', 'pointer-events-none');
                         document.getElementById('upload-ui').classList.add('hidden');
                     }, 800);
-
                 } catch (err) {
-                    alert("Falha no Sincronismo: " + err.message);
+                    alert("Erro ao processar: " + err.message);
                     location.reload();
                 }
             };
             reader.readAsText(file);
         };
 
-        // --- RENDER ---
-        const formatTime = (h) => {
-            if (isNaN(h)) return "0h 0m";
-            const hr = Math.floor(h);
-            const mn = Math.round((h - hr) * 60);
-            return `${hr}h ${mn}m`;
-        };
-
+        // Renderização
         function render() {
             const grid = document.getElementById('routes-grid');
             const filtered = state.routes.filter(r => {
@@ -321,29 +316,29 @@
                 paginated.forEach(r => {
                     const isUsed = state.status[r.id];
                     const card = document.createElement('div');
-                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`;
+                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5 shadow-xl' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`;
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex items-center gap-1.5 font-black text-[8px]">
-                                <span class="bg-blue-600 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.origin}</span>
+                                <span class="bg-blue-600 text-white px-2 py-0.5 rounded uppercase">${r.origin}</span>
                                 <i data-lucide="arrow-right" class="w-3 h-3 opacity-30"></i>
-                                <span class="bg-emerald-600 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.iata}</span>
+                                <span class="bg-emerald-600 text-white px-2 py-0.5 rounded uppercase">${r.iata}</span>
                             </div>
                             ${isUsed ? '<span class="text-[8px] font-black text-emerald-600 uppercase bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full animate-pulse">Ativo</span>' : ''}
                         </div>
-                        <h3 class="font-black text-base truncate mb-1">${r.name}</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-5 tracking-tighter">${r.country} • ${r.aircraft}</p>
+                        <h3 class="font-black text-lg truncate mb-1 leading-tight">${r.name}</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-5">${r.country} • ${r.aircraft}</p>
                         
                         <div class="grid grid-cols-3 gap-2 mb-6">
-                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center border border-slate-100 dark:border-slate-800">
+                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center">
                                 <span class="text-[11px] font-black block">${Math.round(r.dist)}km</span>
                                 <span class="text-[7px] text-slate-400 uppercase font-black">Dist</span>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center border border-slate-100 dark:border-slate-800">
-                                <span class="text-[11px] font-black block">${formatTime(r.time)}</span>
+                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center">
+                                <span class="text-[11px] font-black block">${Math.floor(r.time)}h</span>
                                 <span class="text-[7px] text-slate-400 uppercase font-black">Tempo</span>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center border border-slate-100 dark:border-slate-800">
+                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center">
                                 <span class="text-[11px] font-black text-emerald-600 block">$${Math.round(r.profit/1000)}k</span>
                                 <span class="text-[7px] text-slate-400 uppercase font-black">Lucro</span>
                             </div>
@@ -351,7 +346,7 @@
 
                         ${r.stopover ? `
                             <div class="mb-6 p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-3">
-                                <div class="bg-amber-500/20 p-2 rounded-xl text-amber-600"><i data-lucide="navigation" class="w-4 h-4"></i></div>
+                                <i data-lucide="navigation" class="w-4 h-4 text-amber-600"></i>
                                 <div class="min-w-0"><p class="text-[8px] font-black uppercase text-amber-600">Escala Obrigatória</p><p class="text-[10px] font-bold dark:text-amber-400 truncate">${r.stopover.name} (${r.stopover.iata})</p></div>
                             </div>
                         ` : ''}
@@ -367,14 +362,14 @@
                     `;
                     card.querySelector('.use-btn').onclick = async () => {
                         const active = { ...state.status, [r.id]: !state.status[r.id] };
-                        await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'status'), { active });
+                        await setDoc(doc(db, 'artifacts', 'nexgen_hub_v8', 'users', state.user.uid, 'data', 'status'), { active });
                     };
                     grid.appendChild(card);
                 });
 
                 if (state.filters.l > 0 && totalP > 1) {
                     document.getElementById('pagination-box').classList.remove('hidden');
-                    document.getElementById('page-text').innerText = `Pág ${state.filters.p} / ${totalP}`;
+                    document.getElementById('page-text').innerText = `Página ${state.filters.p} de ${totalP}`;
                     document.getElementById('prev-btn').disabled = state.filters.p === 1;
                     document.getElementById('next-btn').disabled = state.filters.p === totalP;
                 } else document.getElementById('pagination-box').classList.add('hidden');
@@ -382,8 +377,8 @@
 
             document.getElementById('stat-count').innerText = state.routes.length;
             document.getElementById('stat-active').innerText = Object.values(state.status).filter(v=>v).length;
-            const totalPr = filtered.reduce((a,c) => a + (state.status[c.id]?c.profit:0), 0);
-            document.getElementById('stat-profit').innerText = `$${totalPr.toLocaleString('pt-PT', {maximumFractionDigits:0})}`;
+            const totalP_val = filtered.reduce((acc, curr) => acc + (state.status[curr.id] ? curr.profit : 0), 0);
+            document.getElementById('stat-profit').innerText = `$${totalP_val.toLocaleString('pt-PT', {maximumFractionDigits:0})}`;
             lucide.createIcons();
         }
 
@@ -393,6 +388,7 @@
             a.innerHTML = airs.map(x => `<option value="${x}">${x==='all'?'Aeronaves':x}</option>`).join('');
         }
 
+        // Eventos
         document.getElementById('search-input').oninput = (e) => { state.filters.s = e.target.value; state.filters.p=1; render(); };
         document.getElementById('filter-aircraft').onchange = (e) => { state.filters.a = e.target.value; state.filters.p=1; render(); };
         document.getElementById('filter-status').onchange = (e) => { state.filters.st = e.target.value; state.filters.p=1; render(); };
