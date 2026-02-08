@@ -13,19 +13,21 @@
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
         .glass-effect { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); }
         .dark .glass-effect { background: rgba(15, 23, 42, 0.9); }
+        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        .animate-pulse-soft { animation: pulse-soft 2s infinite; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen">
 
     <div id="app">
-        <!-- Overlay de Login/Carregamento -->
-        <div id="auth-screen" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950 transition-all duration-700">
+        <!-- Overlay Global (Login e Upload) -->
+        <div id="global-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950 transition-all duration-700">
             <div class="max-w-sm w-full px-8 text-center">
-                <div id="auth-spinner" class="inline-block animate-spin text-blue-600 mb-8">
+                <div id="status-spinner" class="inline-block animate-spin text-blue-600 mb-8">
                     <i data-lucide="loader-2" class="w-16 h-16"></i>
                 </div>
                 
-                <div id="login-container" class="hidden animate-in fade-in zoom-in duration-500">
+                <div id="login-ui" class="hidden animate-in fade-in zoom-in duration-500">
                     <div class="bg-gradient-to-br from-blue-600 to-indigo-700 w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-500/40">
                         <i data-lucide="plane-takeoff" class="text-white w-12 h-12"></i>
                     </div>
@@ -41,8 +43,16 @@
                         </svg>
                         Login com Google
                     </button>
-                    <p id="error-msg" class="text-red-500 text-[10px] mt-6 font-bold uppercase hidden"></p>
                 </div>
+
+                <div id="upload-status-ui" class="hidden">
+                    <p id="upload-msg" class="text-white font-black uppercase tracking-widest text-sm animate-pulse-soft">A processar dados do HUB...</p>
+                    <div class="w-full bg-slate-800 h-2 rounded-full mt-4 overflow-hidden">
+                        <div id="upload-progress" class="bg-blue-600 h-full w-0 transition-all duration-300"></div>
+                    </div>
+                </div>
+
+                <p id="global-error" class="text-red-500 text-[10px] mt-6 font-bold uppercase hidden"></p>
             </div>
         </div>
 
@@ -72,10 +82,9 @@
                 </div>
             </div>
 
-            <div id="user-menu" class="hidden absolute right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2">
+            <div id="user-menu" class="hidden absolute right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-2">
                 <div class="p-3 border-b border-slate-100 dark:border-slate-800 mb-2">
-                    <p id="full-user-name" class="text-[10px] font-black uppercase text-slate-900 dark:text-white truncate"></p>
-                    <p id="user-email" class="text-[9px] text-slate-500 truncate"></p>
+                    <p id="full-user-name" class="text-[10px] font-black uppercase text-slate-900 dark:text-white truncate">Carregando...</p>
                 </div>
                 <button onclick="logout()" class="w-full flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all font-bold text-xs">
                     <i data-lucide="log-out" class="w-4 h-4"></i> Encerrar Sessão
@@ -87,12 +96,12 @@
             <!-- Estatísticas -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
                 <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
-                    <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Rotas Totais</p>
+                    <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Malha Total</p>
                     <p id="stat-total" class="text-2xl font-black">0</p>
                 </div>
                 <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
-                    <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Ativas</p>
-                    <p id="stat-active" class="text-2xl font-black text-emerald-500">0</p>
+                    <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Em Voo</p>
+                    <p id="stat-active" class="text-xl font-black text-emerald-500">0</p>
                 </div>
                 <div class="col-span-2 sm:col-span-1 bg-blue-600 p-5 rounded-3xl shadow-xl shadow-blue-500/20">
                     <p class="text-[9px] uppercase font-black text-blue-100 mb-1">Lucro Estimado</p>
@@ -101,7 +110,7 @@
             </div>
 
             <!-- Filtros -->
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 mb-8 space-y-4">
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-3xl border border-slate-200 dark:border-slate-800 mb-8 space-y-4">
                 <div class="relative">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
                     <input type="text" id="search-input" placeholder="Pesquisar Destino ou IATA..." 
@@ -130,31 +139,28 @@
             <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
             <div id="empty-state" class="hidden flex flex-col items-center justify-center py-24 text-center">
-                <div class="bg-slate-200 dark:bg-slate-800 w-20 h-20 rounded-full flex items-center justify-center mb-4">
-                    <i data-lucide="database" class="text-slate-400 w-8 h-8"></i>
+                <div class="bg-slate-200 dark:bg-slate-800 w-20 h-20 rounded-full flex items-center justify-center mb-4 text-slate-400">
+                    <i data-lucide="database"></i>
                 </div>
-                <h3 class="font-black uppercase text-slate-400 text-sm">Base de Dados Vazia</h3>
-                <p class="text-[10px] text-slate-500 mt-2 max-w-[220px]">Carregue o seu ficheiro CSV para sincronizar o hub da NexGen Airlines.</p>
+                <h3 class="font-black uppercase text-slate-400 text-sm">Sem Dados Carregados</h3>
+                <p class="text-[10px] text-slate-500 mt-2 max-w-[220px]">Importe o seu CSV do Airline Commander para sincronizar.</p>
             </div>
 
             <!-- Paginação -->
-            <div id="pagination-box" class="hidden flex items-center justify-between mt-12 p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800">
+            <div id="pagination-box" class="hidden flex items-center justify-between mt-12 p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800 shadow-sm">
                 <button id="prev-btn" class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl disabled:opacity-20"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                <div class="text-center">
-                    <p id="page-count" class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Página 1 de 1</p>
-                </div>
+                <p id="page-count" class="text-[10px] font-black uppercase text-slate-400">Pág 1 de 1</p>
                 <button id="next-btn" class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl disabled:opacity-20"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
             </div>
         </main>
     </div>
 
-    <!-- Firebase -->
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // CONFIGURAÇÃO INTEGRADA
         const firebaseConfig = {
             apiKey: "AIzaSyBA9SPhouEHpLCbelK5sMOIGCTI8qsdWuQ",
             authDomain: "nextgen-hub-399b2.firebaseapp.com",
@@ -165,7 +171,7 @@
             measurementId: "G-Z6HP2BYZ44"
         };
 
-        const appId = "nexgen-hub-v3-prod";
+        const appId = "nexgen-hub-v4-final";
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -178,7 +184,7 @@
             filters: { search: "", aircraft: "all", status: "all", sort: "profit", page: 1, limit: 100 }
         };
 
-        // --- AUTH ---
+        // --- AUTH & UI ---
         window.logout = () => signOut(auth).then(() => window.location.reload());
         window.toggleUserMenu = () => document.getElementById('user-menu').classList.toggle('hidden');
 
@@ -186,26 +192,26 @@
             try {
                 await signInWithPopup(auth, provider);
             } catch (err) {
-                const errBox = document.getElementById('error-msg');
-                errBox.classList.remove('hidden');
-                errBox.innerText = "ERRO: " + err.message;
+                const errEl = document.getElementById('global-error');
+                errEl.classList.remove('hidden');
+                errEl.innerText = "ERRO DE LOGIN: " + err.message;
             }
         };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
                 state.user = user;
-                document.getElementById('auth-screen').classList.add('opacity-0', 'pointer-events-none');
+                document.getElementById('global-overlay').classList.add('opacity-0', 'pointer-events-none');
                 document.getElementById('user-photo').src = user.photoURL || '';
                 document.getElementById('full-user-name').innerText = user.displayName;
-                document.getElementById('user-email').innerText = user.email;
                 syncData(user.uid);
             } else {
-                document.getElementById('auth-spinner').classList.add('hidden');
-                document.getElementById('login-container').classList.remove('hidden');
+                document.getElementById('status-spinner').classList.add('hidden');
+                document.getElementById('login-ui').classList.remove('hidden');
             }
         });
 
+        // --- DATA SYNC ---
         function syncData(uid) {
             const rRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'routes');
             const sRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'status');
@@ -214,7 +220,7 @@
                 state.routes = snap.exists() ? snap.data().list : [];
                 updateOptions();
                 render();
-            }, (err) => console.error("Firestore Error:", err));
+            });
 
             onSnapshot(sRef, (snap) => {
                 state.status = snap.exists() ? snap.data().active : {};
@@ -227,19 +233,54 @@
             await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'status'), { active });
         }
 
-        async function uploadCSV(e) {
+        // --- CSV PARSER INTELIGENTE ---
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/);
+            if (lines.length < 2) return [];
+
+            const parseLine = (line) => {
+                const result = [];
+                let cell = '';
+                let inQuotes = false;
+                for (let i = 0; i < line.length; i++) {
+                    const char = line[i];
+                    if (char === '"' && line[i+1] === '"') { cell += '"'; i++; }
+                    else if (char === '"') { inQuotes = !inQuotes; }
+                    else if (char === ',' && !inQuotes) { result.push(cell.trim()); cell = ''; }
+                    else { cell += char; }
+                }
+                result.push(cell.trim());
+                return result;
+            };
+
+            const headers = parseLine(lines[0]);
+            return lines.slice(1).filter(l => l.trim()).map((line, idx) => {
+                const values = parseLine(line);
+                const obj = {};
+                headers.forEach((h, i) => obj[h] = values[i]);
+                return obj;
+            });
+        }
+
+        async function handleUpload(e) {
             const file = e.target.files[0];
-            if(!file) return;
+            if (!file || !state.user) return;
+
+            // Mostrar progresso
+            document.getElementById('global-overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.getElementById('login-ui').classList.add('hidden');
+            document.getElementById('status-spinner').classList.remove('hidden');
+            document.getElementById('upload-status-ui').classList.remove('hidden');
+            
             const reader = new FileReader();
             reader.onload = async (ev) => {
-                const lines = ev.target.result.split('\n');
-                const headers = lines[0].split(',').map(h => h.trim());
-                const newList = lines.slice(1).filter(l => l.trim()).map((line, idx) => {
-                    const v = line.split(',');
-                    const o = {}; headers.forEach((h, i) => o[h] = v[i]);
-                    return {
+                try {
+                    const rawData = parseCSV(ev.target.result);
+                    document.getElementById('upload-progress').style.width = '50%';
+
+                    const newList = rawData.map((o, idx) => ({
                         id: o['dest.id'] || `R-${idx}-${Date.now()}`,
-                        name: o['dest.name'] || 'S/N',
+                        name: o['dest.name'] || 'Destino',
                         iata: o['dest.iata'] || '???',
                         country: o['dest.country'] || '-',
                         dist: parseFloat(o['direct_dist']) || 0,
@@ -247,17 +288,35 @@
                         profit: parseFloat(o['profit_pt']) || 0,
                         market: o['market'] || '?',
                         aircraft: file.name.toLowerCase().includes('mc214') ? 'MC-21-400' : 'Avião',
-                        origin: file.name.toLowerCase().includes('jfk') ? 'JFK' : 'Origem',
-                        config: { y: o['cfg.y'], j: o['cfg.j'], f: o['cfg.f'] },
-                        prices: { y: o['tkt.y'], j: o['tkt.j'], f: o['tkt.f'] },
+                        origin: file.name.toLowerCase().includes('jfk') ? 'JFK' : 'HUB',
+                        config: { y: o['cfg.y'] || 0, j: o['cfg.j'] || 0, f: o['cfg.f'] || 0 },
+                        prices: { y: o['tkt.y'] || 0, j: o['tkt.j'] || 0, f: o['tkt.f'] || 0 },
                         stopover: o['stop.iata'] ? { name: o['stop.name'], iata: o['stop.iata'], country: o['stop.country'] } : null
-                    };
-                });
-                await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'routes'), { list: newList });
+                    }));
+
+                    // Verificar tamanho (Limite Firestore ~1MB)
+                    const jsonSize = new Blob([JSON.stringify(newList)]).size;
+                    if (jsonSize > 1000000) {
+                        throw new Error("Arquivo muito grande. Tente carregar menos de 2000 rotas por vez.");
+                    }
+
+                    await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'routes'), { list: newList });
+                    
+                    document.getElementById('upload-progress').style.width = '100%';
+                    setTimeout(() => {
+                        document.getElementById('global-overlay').classList.add('opacity-0', 'pointer-events-none');
+                        document.getElementById('upload-status-ui').classList.add('hidden');
+                    }, 500);
+
+                } catch (err) {
+                    alert("FALHA NO UPLOAD: " + err.message);
+                    document.getElementById('global-overlay').classList.add('opacity-0', 'pointer-events-none');
+                }
             };
             reader.readAsText(file);
         }
 
+        // --- RENDERING ---
         function render() {
             const grid = document.getElementById('routes-grid');
             const filtered = state.routes.filter(r => {
@@ -284,7 +343,7 @@
                 paginated.forEach(r => {
                     const isUsed = state.status[r.id];
                     const card = document.createElement('div');
-                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`;
+                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5 shadow-xl' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`;
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-4">
                             <div class="flex items-center gap-1.5">
@@ -299,16 +358,13 @@
                         
                         <div class="grid grid-cols-3 gap-2 mb-5">
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center">
-                                <span class="block text-[7px] text-slate-400 font-black uppercase mb-0.5">Dist</span>
-                                <span class="text-[11px] font-black">${Math.round(r.dist)}km</span>
+                                <span class="text-[11px] font-black block">${Math.round(r.dist)}km</span>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center">
-                                <span class="block text-[7px] text-slate-400 font-black uppercase mb-0.5">Voo</span>
-                                <span class="text-[11px] font-black">${Math.floor(r.time)}h</span>
+                                <span class="text-[11px] font-black block">${Math.floor(r.time)}h</span>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center">
-                                <span class="block text-[7px] text-slate-400 font-black uppercase mb-0.5">Lucro</span>
-                                <span class="text-[11px] font-black text-emerald-600">$${Math.round(r.profit/1000)}k</span>
+                                <span class="text-[11px] font-black text-emerald-600 block">$${Math.round(r.profit/1000)}k</span>
                             </div>
                         </div>
 
@@ -316,32 +372,19 @@
                             <div class="mb-5 p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-3">
                                 <i data-lucide="navigation" class="w-4 h-4 text-amber-600"></i>
                                 <div class="min-w-0">
-                                    <p class="text-[8px] font-black uppercase text-amber-600">Escala Obrigatória</p>
-                                    <p class="text-[10px] font-bold text-amber-900 dark:text-amber-400 truncate">${r.stopover.name} (${r.stopover.iata})</p>
-                                    <p class="text-[9px] text-amber-800/60 dark:text-amber-400/60 truncate">${r.stopover.country}</p>
+                                    <p class="text-[8px] font-black uppercase text-amber-600">Escala Necessária</p>
+                                    <p class="text-[10px] font-bold dark:text-amber-400 truncate">${r.stopover.name} (${r.stopover.iata})</p>
                                 </div>
                             </div>
                         ` : ''}
 
-                        <div class="bg-blue-600/5 dark:bg-blue-600/10 p-4 rounded-[1.5rem] border border-blue-600/10 mb-5">
-                            <div class="text-[10px] font-bold flex justify-between items-center mb-1.5">
-                                <span class="opacity-50">Económica (Y)</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-black">${r.config.y}</span>
-                                    <span class="bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded font-black text-[9px]">$${r.prices.y}</span>
-                                </div>
-                            </div>
-                            <div class="text-[10px] font-bold flex justify-between items-center">
-                                <span class="opacity-50">Executiva (J)</span>
-                                <div class="flex items-center gap-2">
-                                    <span class="font-black">${r.config.j}</span>
-                                    <span class="bg-black/5 dark:bg-white/5 px-2 py-0.5 rounded font-black text-[9px]">$${r.prices.j}</span>
-                                </div>
-                            </div>
+                        <div class="bg-blue-600/5 dark:bg-blue-600/10 p-4 rounded-[1.5rem] border border-blue-600/10 mb-5 text-[10px]">
+                            <div class="flex justify-between font-bold mb-1.5"><span>Económica</span><span>${r.config.y} @ $${r.prices.y}</span></div>
+                            <div class="flex justify-between font-bold"><span>Executiva</span><span>${r.config.j} @ $${r.prices.j}</span></div>
                         </div>
 
-                        <button class="use-btn w-full py-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all ${isUsed ? 'bg-slate-900 text-white' : 'bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white'} shadow-sm">
-                            ${isUsed ? 'Liberar Aeronave' : 'Iniciar Rota'}
+                        <button class="use-btn w-full py-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all ${isUsed ? 'bg-slate-900 text-white' : 'bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white'}">
+                            ${isUsed ? 'Finalizar Rota' : 'Iniciar Rota'}
                         </button>
                     `;
                     card.querySelector('.use-btn').onclick = () => toggleUse(r.id);
@@ -375,9 +418,9 @@
         document.getElementById('filter-status').onchange = (e) => { state.filters.status = e.target.value; state.filters.page=1; render(); };
         document.getElementById('sort-by').onchange = (e) => { state.filters.sort = e.target.value; render(); };
         document.getElementById('items-per-page').onchange = (e) => { state.filters.limit = parseInt(e.target.value); state.filters.page=1; render(); };
-        document.getElementById('prev-btn').onclick = () => { state.filters.page--; window.scrollTo(0,0); render(); };
-        document.getElementById('next-btn').onclick = () => { state.filters.page++; window.scrollTo(0,0); render(); };
-        document.getElementById('csv-upload').onchange = uploadCSV;
+        document.getElementById('prev-btn').onclick = () => { state.filters.page--; window.scrollTo(0, 0); render(); };
+        document.getElementById('next-btn').onclick = () => { state.filters.page++; window.scrollTo(0, 0); render(); };
+        document.getElementById('csv-upload').onchange = handleUpload;
 
         lucide.createIcons();
     </script>
