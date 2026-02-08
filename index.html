@@ -101,14 +101,14 @@
                 
                 <div class="flex items-center gap-2">
                     <!-- Botão de Gestão de Arquivos Principal -->
-                    <button onclick="toggleManageModal()" class="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-3 py-2.5 rounded-xl btn-active border border-blue-100 dark:border-blue-900/30">
+                    <button onclick="toggleManageModal()" class="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-3 py-2.5 rounded-xl btn-active border border-blue-100 dark:border-blue-900/30 shadow-sm">
                         <i data-lucide="database" class="w-4 h-4"></i>
                         <span class="text-[10px] font-black uppercase hidden sm:inline">Meus Dados</span>
                     </button>
 
                     <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
                     
-                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 pr-3 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-200 transition-all">
+                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 pr-3 rounded-full border border-slate-200 dark:border-slate-700 hover:bg-slate-200 transition-all shadow-inner">
                         <img id="user-photo" src="" class="w-7 h-7 rounded-full bg-slate-300" onerror="this.src='https://ui-avatars.com/api/?name=Pilot&background=3b82f6&color=fff'">
                         <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
                     </button>
@@ -116,7 +116,7 @@
             </div>
 
             <!-- Menu User -->
-            <div id="user-menu" class="hidden absolute right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-2 animate-in slide-in-from-top-2">
+            <div id="user-menu" class="hidden absolute right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-2 animate-in slide-in-from-top-2 z-[105]">
                 <p id="user-display-name" class="p-3 text-[10px] font-black uppercase border-b border-slate-100 dark:border-slate-800 mb-1"></p>
                 <button onclick="logout()" class="w-full flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all font-bold text-xs uppercase tracking-widest">
                     <i data-lucide="log-out" class="w-4 h-4"></i> Encerrar Sessão
@@ -129,11 +129,11 @@
         <main class="max-w-7xl mx-auto px-4 py-6">
             <!-- Estatísticas -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
                     <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Rotas Salvas</p>
                     <p id="stat-count" class="text-2xl font-black">0</p>
                 </div>
-                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
                     <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Operacionais</p>
                     <p id="stat-active" class="text-2xl font-black text-emerald-500">0</p>
                 </div>
@@ -144,21 +144,26 @@
             </div>
 
             <!-- Painel de Filtros -->
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-[2rem] border border-slate-200 dark:border-slate-800 mb-10 space-y-4 shadow-sm">
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-200 dark:border-slate-800 mb-10 space-y-4 shadow-sm">
                 <div class="relative">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
                     <input type="text" id="search-input" placeholder="Pesquisar Destino ou IATA..." 
-                           class="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none">
+                           class="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                 </div>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <select id="filter-aircraft" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none"></select>
-                    <select id="filter-origin" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none"></select>
-                    <select id="filter-status" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none">
-                        <option value="all">Ver Tudo</option>
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                    <select id="filter-type" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer">
+                        <option value="all">Todos Tipos</option>
+                        <option value="passenger">Passageiros</option>
+                        <option value="cargo">Carga</option>
+                    </select>
+                    <select id="filter-aircraft" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer"></select>
+                    <select id="filter-origin" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer"></select>
+                    <select id="filter-status" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer">
+                        <option value="all">Todos Status</option>
                         <option value="used">Ativas</option>
                         <option value="unused">Disponíveis</option>
                     </select>
-                    <select id="page-limit" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none">
+                    <select id="page-limit" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer col-span-2 md:col-span-1">
                         <option value="100">100 por pág.</option>
                         <option value="50">50 por pág.</option>
                         <option value="0">Ver Todas</option>
@@ -176,7 +181,7 @@
                 </div>
                 <h3 class="font-black uppercase text-sm tracking-widest text-slate-400">Sem Malha Aérea</h3>
                 <p class="text-[10px] mt-2 max-w-[220px]">Adicione um ficheiro CSV e defina o seu HUB de origem para começar.</p>
-                <button onclick="document.getElementById('csv-upload').click()" class="mt-8 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all btn-active">Carregar CSV</button>
+                <button onclick="document.getElementById('csv-upload').click()" class="mt-8 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-blue-700 transition-all btn-active shadow-lg shadow-blue-500/20">Carregar CSV</button>
             </div>
 
             <!-- Paginação -->
@@ -206,7 +211,14 @@
 
         const appId = "nexgen_hub_v11_hybrid";
         let app, auth, db, provider;
-        let state = { user: null, uploads: [], routes: [], status: {}, filters: { s: "", a: "all", h: "all", st: "all", p: 1, l: 100 } };
+        let state = { 
+            user: null, 
+            uploads: [], 
+            routes: [], 
+            status: {}, 
+            filters: { s: "", a: "all", h: "all", st: "all", t: "all", p: 1, l: 100 } 
+        };
+
         let tempUpload = { fileName: "", list: [], type: "passenger" };
 
         try {
@@ -267,7 +279,10 @@
                     const list = lines.slice(1).map((line, idx) => {
                         const vals = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
                         const o = {}; 
-                        headers.forEach((h, i) => o[h] = vals[i] ? vals[i].replace(/"/g, '').trim() : ""); 
+                        headers.forEach((h, i) => {
+                            let val = vals[i] ? vals[i].replace(/"/g, '').trim() : "";
+                            o[h] = val;
+                        }); 
                         
                         return {
                             id: o['dest.id'] || `R-${idx}-${Date.now()}`,
@@ -279,8 +294,8 @@
                             profit: parseFloat(o['profit_pt']) || 0,
                             aircraft: file.name.toLowerCase().includes('mc214') ? 'MC-21-400' : (file.name.toLowerCase().includes('b748') ? 'B747-8F' : 'Aeronave'),
                             type: fileType,
-                            config: isCargo ? { l: o['cfg.l'] || 0, h: o['cfg.h'] || 0 } : { y: o['cfg.y'] || 0, j: o['cfg.j'] || 0, f: o['cfg.f'] || 0 },
-                            prices: isCargo ? { l: o['tkt.l'] || 0, h: o['tkt.h'] || 0 } : { y: o['tkt.y'] || 0, j: o['tkt.j'] || 0, f: o['tkt.f'] || 0 },
+                            config: isCargo ? { l: o['cfg.l'] || "0", h: o['cfg.h'] || "0" } : { y: o['cfg.y'] || "0", j: o['cfg.j'] || "0", f: o['cfg.f'] || "0" },
+                            prices: isCargo ? { l: o['tkt.l'] || "0", h: o['tkt.h'] || "0" } : { y: o['tkt.y'] || "0", j: o['tkt.j'] || "0", f: o['tkt.f'] || "0" },
                             stopover: o['stop.iata'] ? { name: o['stop.name'] || "Escala", iata: o['stop.iata'] } : null
                         };
                     });
@@ -326,25 +341,32 @@
 
         function renderUploadsList() {
             const container = document.getElementById('uploads-list');
-            container.innerHTML = state.uploads.length === 0 ? '<p class="text-center text-slate-400 py-10 text-[10px] font-black uppercase">Vazio</p>' : '';
+            container.innerHTML = state.uploads.length === 0 ? '<p class="text-center text-slate-400 py-10 text-[10px] font-black uppercase tracking-widest">Nenhum histórico</p>' : '';
             state.uploads.forEach(up => {
                 const div = document.createElement('div');
-                div.className = "p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center";
+                div.className = "p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 flex justify-between items-center animate-in fade-in";
                 div.innerHTML = `
                     <div class="min-w-0 flex-1 pr-4">
                         <div class="flex items-center gap-2 mb-1">
-                            <span class="bg-blue-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase">${up.hub}</span>
-                            <span class="text-[8px] font-black uppercase ${up.type === 'cargo' ? 'text-amber-500' : 'text-emerald-500'}">[${up.type}]</span>
-                            <p class="text-xs font-black truncate">${up.fileName}</p>
+                            <span class="bg-blue-600 text-white text-[8px] font-black px-1.5 py-0.5 rounded uppercase leading-none">${up.hub}</span>
+                            <span class="text-[8px] font-black uppercase ${up.type === 'cargo' ? 'text-amber-500' : 'text-emerald-500'} tracking-tighter">[${up.type}]</span>
+                            <p class="text-xs font-black truncate text-slate-900 dark:text-white">${up.fileName}</p>
                         </div>
                         <p class="text-[9px] font-bold text-slate-400 uppercase tracking-tighter">${up.list.length} Rotas • ${new Date(up.date).toLocaleDateString()}</p>
                     </div>
-                    <button onclick="deleteUpload('${up.docId}')" class="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                    <button onclick="deleteUpload('${up.docId}')" class="p-3 bg-red-500/10 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
                 `;
                 container.appendChild(div);
             });
             lucide.createIcons();
         }
+
+        const fmtVal = (val, dec = 1) => {
+            const n = parseFloat(String(val).replace(',', '.'));
+            return isNaN(n) ? "0.0" : n.toFixed(dec);
+        };
 
         function render() {
             const grid = document.getElementById('routes-grid');
@@ -353,7 +375,8 @@
                 const u = state.filters.st === 'all' || (state.filters.st === 'used' ? state.status[r.id] : !state.status[r.id]);
                 const a = state.filters.a === 'all' || r.aircraft === state.filters.a;
                 const h = state.filters.h === 'all' || r.origin === state.filters.h;
-                return s && u && a && h;
+                const t = state.filters.t === 'all' || r.type === state.filters.t;
+                return s && u && a && h && t;
             });
             filtered.sort((a,b) => b.profit - a.profit);
             const paginated = state.filters.l === 0 ? filtered : filtered.slice((state.filters.p - 1) * state.filters.l, state.filters.p * state.filters.l);
@@ -366,21 +389,21 @@
                     const isUsed = state.status[r.id];
                     const isCargo = r.type === 'cargo';
                     const card = document.createElement('div');
-                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`;
+                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5 shadow-xl' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`;
                     
                     const classesHtml = isCargo ? `
                         <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5">
                             <span class="opacity-70 italic text-amber-500">Carga Grande</span>
-                            <span class="font-black">${parseFloat(r.config.l).toFixed(1)}% @ $${r.prices.l}</span>
+                            <span class="font-black text-slate-800 dark:text-slate-100">${fmtVal(r.config.l)}% @ $${fmtVal(r.prices.l, 0)}</span>
                         </div>
                         <div class="flex justify-between font-bold">
                             <span class="opacity-70 italic text-amber-600">Carga Pesada</span>
-                            <span class="font-black">${parseFloat(r.config.h).toFixed(1)}% @ $${r.prices.h}</span>
+                            <span class="font-black text-slate-800 dark:text-slate-100">${fmtVal(r.config.h)}% @ $${fmtVal(r.prices.h, 0)}</span>
                         </div>
                     ` : `
-                        <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5"><span class="opacity-70 italic text-blue-500">Classe Y</span><span class="font-black">${r.config.y} pax @ $${r.prices.y}</span></div>
-                        <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5"><span class="opacity-70 italic text-indigo-500">Classe J</span><span class="font-black">${r.config.j} pax @ $${r.prices.j}</span></div>
-                        <div class="flex justify-between font-bold"><span class="opacity-70 italic text-purple-500">Classe F</span><span class="font-black">${r.config.f} pax @ $${r.prices.f}</span></div>
+                        <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5"><span class="opacity-70 italic text-blue-500">Classe Y</span><span class="font-black">${r.config.y} pax @ $${fmtVal(r.prices.y, 0)}</span></div>
+                        <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5"><span class="opacity-70 italic text-indigo-500">Classe J</span><span class="font-black">${r.config.j} pax @ $${fmtVal(r.prices.j, 0)}</span></div>
+                        <div class="flex justify-between font-bold"><span class="opacity-70 italic text-purple-500">Classe F</span><span class="font-black">${r.config.f} pax @ $${fmtVal(r.prices.f, 0)}</span></div>
                     `;
 
                     card.innerHTML = `
@@ -391,25 +414,25 @@
                                 <span class="bg-emerald-600 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.iata}</span>
                                 ${isCargo ? '<span class="bg-amber-500 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">CARGO</span>' : ''}
                             </div>
-                            ${isUsed ? '<span class="text-[8px] font-black text-emerald-600 uppercase bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full">Ativo</span>' : ''}
+                            ${isUsed ? '<span class="text-[8px] font-black text-emerald-600 uppercase bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full animate-pulse shadow-sm">Operando</span>' : ''}
                         </div>
-                        <h3 class="font-black text-lg truncate mb-1 leading-tight">${r.name}</h3>
+                        <h3 class="font-black text-lg truncate mb-1 leading-tight text-slate-800 dark:text-white">${r.name}</h3>
                         <p class="text-[10px] text-slate-400 font-bold uppercase mb-5">${r.country} • ${r.aircraft}</p>
                         <div class="grid grid-cols-3 gap-2 mb-6 text-center">
-                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
                                 <span class="text-[11px] font-black block">${Math.round(r.dist)}km</span>
-                                <span class="text-[7px] text-slate-400 uppercase font-black">Dist</span>
+                                <span class="text-[7px] text-slate-400 uppercase font-black tracking-tighter">Dist</span>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
                                 <span class="text-[11px] font-black text-emerald-600 block">$${Math.round(r.profit/1000)}k</span>
-                                <span class="text-[7px] text-slate-400 uppercase font-black">Lucro</span>
+                                <span class="text-[7px] text-slate-400 uppercase font-black tracking-tighter">Lucro</span>
                             </div>
-                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800">
+                            <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
                                 <span class="text-[11px] font-black block">${Math.floor(r.time)}h</span>
-                                <span class="text-[7px] text-slate-400 uppercase font-black">Voo</span>
+                                <span class="text-[7px] text-slate-400 uppercase font-black tracking-tighter">Voo</span>
                             </div>
                         </div>
-                        <div class="bg-blue-600/5 dark:bg-blue-600/10 p-4 rounded-[1.8rem] border border-blue-600/10 mb-6 text-[10px] space-y-1.5">
+                        <div class="bg-blue-600/5 dark:bg-blue-600/10 p-4 rounded-[1.8rem] border border-blue-600/10 mb-6 text-[10px] space-y-1.5 shadow-inner">
                             ${classesHtml}
                         </div>
                         <button class="use-btn w-full py-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all btn-active ${isUsed ? 'bg-slate-900 text-white shadow-xl' : 'bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white'} shadow-sm">
@@ -448,10 +471,11 @@
             const airs = ['all', ...new Set(state.routes.map(r => r.aircraft))];
             const hubs = ['all', ...new Set(state.routes.map(r => r.origin))];
             a.innerHTML = airs.map(x => `<option value="${x}">${x==='all'?'Aeronave':x}</option>`).join('');
-            h.innerHTML = hubs.map(x => `<option value="${x}">${x==='all'?'Origem (HUB)':x}</option>`).join('');
+            h.innerHTML = hubs.map(x => `<option value="${x}">${x==='all'?'HUB':x}</option>`).join('');
         }
 
         document.getElementById('search-input').oninput = (e) => { state.filters.s = e.target.value; state.filters.p=1; render(); };
+        document.getElementById('filter-type').onchange = (e) => { state.filters.t = e.target.value; state.filters.p=1; render(); };
         document.getElementById('filter-aircraft').onchange = (e) => { state.filters.a = e.target.value; state.filters.p=1; render(); };
         document.getElementById('filter-origin').onchange = (e) => { state.filters.h = e.target.value; state.filters.p=1; render(); };
         document.getElementById('filter-status').onchange = (e) => { state.filters.st = e.target.value; state.filters.p=1; render(); };
