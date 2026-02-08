@@ -100,7 +100,6 @@
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <!-- Botão de Gestão de Arquivos Principal -->
                     <button onclick="toggleManageModal()" class="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/20 text-blue-600 px-3 py-2.5 rounded-xl btn-active border border-blue-100 dark:border-blue-900/30 shadow-sm">
                         <i data-lucide="database" class="w-4 h-4"></i>
                         <span class="text-[10px] font-black uppercase hidden sm:inline">Meus Dados</span>
@@ -263,17 +262,33 @@
             });
         }
 
-        // Função para detetar a aeronave baseada no código ICAO/IATA comum no nome do ficheiro
+        // Função para detetar a aeronave baseada na lista detalhada (Pax e Cargo)
         function detectAircraft(fileName) {
             const name = fileName.toLowerCase();
-            if (name.includes('mc214')) return 'MC-21-400';
-            if (name.includes('a388')) return 'A380-800';
-            if (name.includes('b748')) return name.includes('f') ? 'B747-8F' : 'B747-8';
-            if (name.includes('a359')) return 'A350-900';
-            if (name.includes('b77w')) return 'B777-300ER';
-            if (name.includes('a320')) return 'A320-200';
-            if (name.includes('b738')) return 'B737-800';
-            if (name.includes('a321')) return 'A321-200';
+            const mapping = {
+                'mc214': 'MC-21-400',
+                'a388': 'Airbus A380-800',
+                'b748f': 'Boeing 747-8F',
+                'b748': 'Boeing 747-8',
+                'a359': 'Airbus A350-900',
+                'b77w': 'Boeing 777-300ER',
+                'a320': 'Airbus A320-200',
+                'b738': 'Boeing 737-800',
+                'a321': 'Airbus A321-200',
+                'saab34': 'Saab 340',
+                'saab20': 'Saab 2000',
+                'm202': 'Martin 2-0-2',
+                'd3281': 'Dornier 328-100',
+                'tu134a': 'Tupolev Tu-134A',
+                'tu154m': 'Tupolev Tu-154M',
+                'tu154': 'Tupolev Tu-154',
+                'tu2410': 'Tupolev Tu-204-100',
+                'tu2412': 'Tupolev Tu-204-120'
+            };
+            
+            for (const key in mapping) {
+                if (name.includes(key)) return mapping[key];
+            }
             return 'Aeronave';
         }
 
@@ -409,11 +424,11 @@
                     const classesHtml = isCargo ? `
                         <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5">
                             <span class="opacity-70 italic text-amber-500">Carga Grande</span>
-                            <span class="font-black text-slate-800 dark:text-slate-100">${fmtVal(r.config.l)}% @ $${fmtVal(r.prices.l, 0)}</span>
+                            <span class="font-black text-slate-800 dark:text-slate-100">${fmtVal(r.config.l, 2)}% @ $${fmtVal(r.prices.l, 0)}</span>
                         </div>
                         <div class="flex justify-between font-bold">
                             <span class="opacity-70 italic text-amber-600">Carga Pesada</span>
-                            <span class="font-black text-slate-800 dark:text-slate-100">${fmtVal(r.config.h)}% @ $${fmtVal(r.prices.h, 0)}</span>
+                            <span class="font-black text-slate-800 dark:text-slate-100">${fmtVal(r.config.h, 2)}% @ $${fmtVal(r.prices.h, 0)}</span>
                         </div>
                     ` : `
                         <div class="flex justify-between font-bold border-b border-blue-200/20 pb-1.5"><span class="opacity-70 italic text-blue-500">Classe Y</span><span class="font-black">${r.config.y} pax @ $${fmtVal(r.prices.y, 0)}</span></div>
