@@ -3,58 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexGen HUB - Gestão Profissional AM4</title>
+    <title>NexGen HUB - Controlo de Operações</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #3b82f6; border-radius: 10px; }
         .glass-effect { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(16px); }
         .dark .glass-effect { background: rgba(15, 23, 42, 0.9); }
-        @keyframes pulse-soft { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        .animate-pulse-soft { animation: pulse-soft 2s infinite; }
+        .btn-active:active { transform: scale(0.95); }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen font-sans">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 min-h-screen pb-20">
 
     <div id="app">
-        <!-- Overlay Global -->
+        <!-- Overlay de Login e Avisos -->
         <div id="global-overlay" class="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950 transition-all duration-700">
             <div class="max-w-sm w-full px-8 text-center">
-                <div id="status-spinner" class="inline-block animate-spin text-blue-600 mb-8">
-                    <i data-lucide="loader-2" class="w-16 h-16"></i>
+                <div id="auth-loader" class="inline-block animate-spin text-blue-600 mb-8">
+                    <i data-lucide="loader-2" class="w-12 h-12"></i>
                 </div>
                 
-                <div id="login-ui" class="hidden animate-in fade-in zoom-in duration-500">
-                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-blue-500/40">
+                <div id="login-container" class="hidden animate-in fade-in zoom-in duration-500">
+                    <div class="bg-gradient-to-br from-blue-600 to-indigo-700 w-24 h-24 rounded-[2rem] flex items-center justify-center mx-auto mb-8 shadow-2xl">
                         <i data-lucide="plane-takeoff" class="text-white w-12 h-12"></i>
                     </div>
-                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-3">NexGen HUB</h2>
-                    <p class="text-slate-400 text-sm font-medium mb-12 uppercase tracking-widest">Controlo de Operações</p>
+                    <h2 class="text-3xl font-black text-white uppercase tracking-tighter mb-2">NexGen HUB</h2>
+                    <p class="text-slate-400 text-xs font-bold mb-12 uppercase tracking-[0.3em]">Operações de Voo</p>
                     
-                    <button id="google-login-btn" class="w-full flex items-center justify-center gap-4 bg-white text-slate-900 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:bg-slate-100 transition-all active:scale-95 shadow-2xl border-b-4 border-slate-200">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24">
-                            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 6.23l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                        </svg>
-                        Login com Google
+                    <button id="google-login-btn" class="w-full flex items-center justify-center gap-4 bg-white text-slate-900 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-100 transition-all shadow-xl border-b-4 border-slate-200 btn-active">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 6.23l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        Login do Google
                     </button>
+                    
+                    <div id="debug-msg" class="text-red-500 text-[9px] mt-8 font-mono opacity-60"></div>
                 </div>
 
-                <div id="upload-status-ui" class="hidden">
-                    <p id="upload-msg" class="text-white font-black uppercase tracking-widest text-sm animate-pulse-soft">Sincronizando Malha...</p>
-                    <div class="w-full bg-slate-800 h-2 rounded-full mt-4 overflow-hidden">
-                        <div id="upload-progress" class="bg-blue-600 h-full w-0 transition-all duration-300"></div>
+                <!-- Barra de Upload -->
+                <div id="upload-ui" class="hidden">
+                    <p class="text-white font-black uppercase text-sm tracking-widest animate-pulse">Sincronizando Malha...</p>
+                    <div class="w-full bg-slate-800 h-2 rounded-full mt-6 overflow-hidden">
+                        <div id="upload-bar" class="bg-blue-600 h-full w-0 transition-all duration-500"></div>
                     </div>
-                </div>
-
-                <div id="error-container" class="hidden mt-8">
-                    <p id="global-error" class="text-red-500 text-[10px] font-bold uppercase"></p>
-                    <button onclick="window.location.reload()" class="mt-4 text-blue-500 text-xs font-black uppercase underline">Recarregar HUB</button>
                 </div>
             </div>
         </div>
@@ -63,74 +55,67 @@
         <header class="sticky top-0 z-50 glass-effect border-b border-slate-200 dark:border-slate-800 px-4 py-3">
             <div class="max-w-7xl mx-auto flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <div class="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-500/20">
-                        <i data-lucide="plane" class="text-white w-5 h-5"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-sm font-black uppercase tracking-tighter leading-none">NEXGEN <span class="text-blue-600">HUB</span></h1>
-                        <p class="text-[8px] font-bold text-slate-400 uppercase tracking-widest mt-1">Satellite Link Active</p>
-                    </div>
+                    <div class="bg-blue-600 p-2 rounded-xl shadow-lg"><i data-lucide="plane" class="text-white w-5 h-5"></i></div>
+                    <h1 class="text-sm font-black uppercase tracking-tighter">NEXGEN <span class="text-blue-600">HUB</span></h1>
                 </div>
                 
-                <div class="flex items-center gap-2">
-                    <button id="add-route-btn" onclick="document.getElementById('csv-upload').click()" class="bg-blue-600 text-white p-2.5 rounded-xl shadow-lg shadow-blue-500/20 active:scale-90 transition-all">
-                        <i data-lucide="plus" class="w-5 h-5"></i>
+                <div class="flex items-center gap-3">
+                    <button onclick="document.getElementById('csv-upload').click()" class="bg-blue-600 text-white p-2.5 rounded-xl btn-active shadow-lg shadow-blue-500/20">
+                        <i data-lucide="upload-cloud" class="w-5 h-5"></i>
                     </button>
-                    <input type="file" id="csv-upload" accept=".csv" class="hidden">
-                    <div class="h-8 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
-                    <button id="user-btn" onclick="toggleUserMenu()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 pr-3 rounded-full hover:bg-slate-200 transition-all border border-slate-200 dark:border-slate-700">
+                    <input type="file" id="csv-upload" accept=".csv" class="hidden" onchange="window.processCSV(event)">
+                    <div class="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-1"></div>
+                    <button onclick="toggleUserMenu()" class="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 p-1 pr-3 rounded-full border border-slate-200 dark:border-slate-700">
                         <img id="user-photo" src="" class="w-7 h-7 rounded-full bg-slate-300">
                         <i data-lucide="chevron-down" class="w-3 h-3 text-slate-400"></i>
                     </button>
                 </div>
             </div>
 
-            <div id="user-menu" class="hidden absolute right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-2 animate-in fade-in slide-in-from-top-2">
-                <div class="p-4 border-b border-slate-100 dark:border-slate-800 mb-2">
-                    <p id="full-user-name" class="text-[10px] font-black uppercase text-slate-900 dark:text-white truncate">NexGen Pilot</p>
-                </div>
+            <div id="user-menu" class="hidden absolute right-4 top-16 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl p-2 animate-in slide-in-from-top-2">
+                <p id="user-display-name" class="p-3 text-[10px] font-black uppercase border-b border-slate-100 dark:border-slate-800 mb-1"></p>
                 <button onclick="logout()" class="w-full flex items-center gap-3 p-3 text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 rounded-2xl transition-all font-bold text-xs uppercase tracking-widest">
-                    <i data-lucide="log-out" class="w-4 h-4"></i> Encerrar Sessão
+                    <i data-lucide="log-out" class="w-4 h-4"></i> Sair
                 </button>
             </div>
         </header>
 
-        <main class="max-w-7xl mx-auto px-4 py-6">
-            <!-- Estatísticas -->
+        <main class="max-w-7xl mx-auto px-4 pt-6">
+            <!-- Estatísticas Flash -->
             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <p class="text-[9px] uppercase font-black text-slate-400 mb-1 tracking-tighter">Rotas Disponíveis</p>
-                    <p id="stat-total" class="text-2xl font-black">0</p>
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
+                    <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Rotas</p>
+                    <p id="stat-count" class="text-2xl font-black">0</p>
                 </div>
-                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <p class="text-[9px] uppercase font-black text-slate-400 mb-1 tracking-tighter">Frota em Voo</p>
+                <div class="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800">
+                    <p class="text-[9px] uppercase font-black text-slate-400 mb-1">Em Voo</p>
                     <p id="stat-active" class="text-2xl font-black text-emerald-500">0</p>
                 </div>
                 <div class="col-span-2 sm:col-span-1 bg-gradient-to-br from-blue-600 to-blue-700 p-5 rounded-3xl shadow-xl shadow-blue-500/20">
-                    <p class="text-[9px] uppercase font-black text-blue-100 mb-1 tracking-tighter">Lucro Projetado</p>
+                    <p class="text-[9px] uppercase font-black text-blue-100 mb-1">Lucro Projetado</p>
                     <p id="stat-profit" class="text-2xl font-black text-white">$0</p>
                 </div>
             </div>
 
-            <!-- Filtros -->
-            <div class="bg-white dark:bg-slate-900 p-5 rounded-[2rem] border border-slate-200 dark:border-slate-800 mb-8 space-y-4 shadow-sm">
+            <!-- Filtros Inteligentes -->
+            <div class="bg-white dark:bg-slate-900 p-5 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 mb-10 space-y-4">
                 <div class="relative">
                     <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
                     <input type="text" id="search-input" placeholder="Destino ou IATA..." 
-                           class="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none font-bold text-sm outline-none focus:ring-2 focus:ring-blue-500 transition-all">
+                           class="w-full pl-11 pr-4 py-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border-none font-bold text-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all">
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <select id="filter-aircraft" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer"></select>
-                    <select id="filter-status" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer">
-                        <option value="all">Todos Status</option>
+                    <select id="filter-aircraft" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none"></select>
+                    <select id="filter-status" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none">
+                        <option value="all">Status: Todos</option>
                         <option value="used">Ativas</option>
-                        <option value="unused">Disponíveis</option>
+                        <option value="unused">Livres</option>
                     </select>
-                    <select id="sort-by" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer">
-                        <option value="profit">Maior Lucro</option>
-                        <option value="dist">Maior Distância</option>
+                    <select id="sort-by" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none">
+                        <option value="profit">Ordem: Lucro</option>
+                        <option value="dist">Ordem: Distância</option>
                     </select>
-                    <select id="items-per-page" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none cursor-pointer">
+                    <select id="page-limit" class="bg-slate-50 dark:bg-slate-800 p-3 rounded-xl text-[10px] font-black uppercase outline-none">
                         <option value="100">100 por pág.</option>
                         <option value="50">50 por pág.</option>
                         <option value="0">Ver Todas</option>
@@ -138,36 +123,31 @@
                 </div>
             </div>
 
-            <!-- Grid -->
-            <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-700"></div>
+            <!-- Grelha Principal -->
+            <div id="routes-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
             <div id="empty-state" class="hidden flex flex-col items-center justify-center py-32 text-center">
-                <div class="bg-slate-200 dark:bg-slate-800 w-24 h-24 rounded-full flex items-center justify-center mb-6 text-slate-400">
-                    <i data-lucide="cloud-off" class="w-10 h-10"></i>
-                </div>
-                <h3 class="font-black uppercase text-slate-400 text-base">Hub Desconectado</h3>
-                <p class="text-sm text-slate-500 mt-2 max-w-[280px] font-medium leading-relaxed">Importe o CSV do Airline Commander para carregar a sua malha aérea.</p>
-                <button onclick="document.getElementById('csv-upload').click()" class="mt-8 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-700 transition-all">Começar Agora</button>
+                <i data-lucide="cloud-off" class="w-12 h-12 text-slate-300 mb-4"></i>
+                <h3 class="font-black uppercase text-slate-400 text-sm">Sem Malha Aérea</h3>
+                <p class="text-[10px] text-slate-500 mt-2 max-w-[240px]">Importe o seu ficheiro CSV para começar a operar a NexGen Airlines.</p>
             </div>
 
             <!-- Paginação -->
-            <div id="pagination-box" class="hidden flex items-center justify-between mt-12 p-6 bg-white dark:bg-slate-900 rounded-[2.5rem] border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div id="pagination-box" class="hidden flex items-center justify-between mt-12 p-6 bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-200 dark:border-slate-800">
                 <button id="prev-btn" class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl disabled:opacity-20 transition-all"><i data-lucide="chevron-left" class="w-5 h-5"></i></button>
-                <p id="page-count" class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Página 1 de 1</p>
+                <p id="page-text" class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Pág 1 / 1</p>
                 <button id="next-btn" class="p-3 bg-slate-50 dark:bg-slate-800 rounded-xl disabled:opacity-20 transition-all"><i data-lucide="chevron-right" class="w-5 h-5"></i></button>
             </div>
         </main>
     </div>
 
-    <!-- Firebase Modular Setup -->
+    <!-- Firebase Script -->
     <script type="module">
-        console.log("✈️ NexGen HUB: Iniciando sistemas...");
-        
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.11.1/firebase-app.js";
-        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.11.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.11.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
-        // Configuração do Utilizador
+        // Configuração Recebida
         const firebaseConfig = {
             apiKey: "AIzaSyBA9SPhouEHpLCbelK5sMOIGCTI8qsdWuQ",
             authDomain: "nextgen-hub-399b2.firebaseapp.com",
@@ -178,222 +158,169 @@
             measurementId: "G-Z6HP2BYZ44"
         };
 
-        const appIdRoot = "nexgen-hub-prod-final";
+        const appId = "nexgen_system_v6";
+        let app, auth, db, provider;
         let state = {
-            user: null,
-            routes: [],
-            status: {},
-            filters: { search: "", aircraft: "all", status: "all", sort: "profit", page: 1, limit: 100 }
+            user: null, routes: [], status: {},
+            filters: { s: "", a: "all", st: "all", o: "profit", p: 1, l: 100 }
         };
 
-        // --- INICIALIZAÇÃO ---
-        let app, auth, db, provider;
+        // --- SISTEMAS DE SEGURANÇA ---
+        const logDebug = (msg) => {
+            console.log("🛠 [NEXGEN DEBUG]:", msg);
+            const el = document.getElementById('debug-msg');
+            if(el) el.innerText = msg;
+        };
+
         try {
             app = initializeApp(firebaseConfig);
             auth = getAuth(app);
             db = getFirestore(app);
             provider = new GoogleAuthProvider();
-            console.log("✅ Firebase: Conectado com sucesso.");
-        } catch (err) {
-            console.error("❌ Firebase: Erro ao carregar SDK.", err);
-            showError("Falha na ligação com o servidor Firebase.");
+            logDebug("Sistemas Firebase online.");
+        } catch (e) {
+            logDebug("Erro Crítico: " + e.message);
         }
 
-        function showError(msg) {
-            const errEl = document.getElementById('global-error');
-            const container = document.getElementById('error-container');
-            if(errEl) {
-                errEl.innerText = msg;
-                container.classList.remove('hidden');
-                document.getElementById('status-spinner').classList.add('hidden');
-                document.getElementById('login-ui').classList.add('hidden');
-            }
-        }
-
-        // --- AUTH & LISTENERS ---
-        window.logout = () => signOut(auth).then(() => window.location.reload());
+        // --- LOGIN & AUTH ---
+        window.logout = () => signOut(auth).then(() => location.reload());
         window.toggleUserMenu = () => document.getElementById('user-menu').classList.toggle('hidden');
 
-        const loginBtn = document.getElementById('google-login-btn');
-        if(loginBtn) {
-            loginBtn.onclick = async () => {
-                console.log("🔑 Google Login: Iniciando popup...");
-                try {
-                    await signInWithPopup(auth, provider);
-                } catch (err) {
-                    console.error("❌ Login Error:", err);
-                    alert("Erro no login: " + err.message);
-                }
-            };
-        }
+        document.getElementById('google-login-btn').onclick = async () => {
+            logDebug("Abrindo popup do Google...");
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (err) {
+                alert("Erro Login: Verifique se autorizou o domínio '" + location.hostname + "' no Firebase Console.");
+                logDebug(err.code);
+            }
+        };
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                console.log("👤 Utilizador Logado:", user.displayName);
                 state.user = user;
                 document.getElementById('global-overlay').classList.add('opacity-0', 'pointer-events-none');
                 document.getElementById('user-photo').src = user.photoURL || '';
-                document.getElementById('full-user-name').innerText = user.displayName;
-                syncData(user.uid);
+                document.getElementById('user-display-name').innerText = user.displayName;
+                sync(user.uid);
             } else {
-                console.log("⚠️ Aguardando Login...");
-                document.getElementById('status-spinner').classList.add('hidden');
-                document.getElementById('login-ui').classList.remove('hidden');
+                document.getElementById('auth-loader').classList.add('hidden');
+                document.getElementById('login-container').classList.remove('hidden');
             }
         });
 
-        // --- GESTÃO DE DADOS ---
-        function syncData(uid) {
-            const rRef = doc(db, 'artifacts', appIdRoot, 'users', uid, 'data', 'routes');
-            const sRef = doc(db, 'artifacts', appIdRoot, 'users', uid, 'data', 'status');
+        // --- SINCRONIZAÇÃO ---
+        function sync(uid) {
+            const rRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'routes');
+            const sRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'status');
 
             onSnapshot(rRef, (snap) => {
-                state.routes = snap.exists() ? snap.data().list : [];
-                updateOptions();
+                state.routes = snap.exists() ? (snap.data().list || []) : [];
+                updateOpts();
                 render();
             });
 
             onSnapshot(sRef, (snap) => {
-                state.status = snap.exists() ? snap.data().active : {};
+                state.status = snap.exists() ? (snap.data().active || {}) : {};
                 render();
             });
         }
 
-        async function toggleUse(id) {
-            if(!state.user) return;
-            const active = { ...state.status, [id]: !state.status[id] };
-            await setDoc(doc(db, 'artifacts', appIdRoot, 'users', state.user.uid, 'data', 'status'), { active });
-        }
-
-        // --- PARSER CSV ---
-        function parseCSV(text) {
-            const lines = text.split(/\r?\n/);
-            if (lines.length < 2) return [];
-
-            const parseLine = (line) => {
-                const result = [];
-                let cell = '';
-                let inQuotes = false;
-                if(!line) return [];
-                for (let i = 0; i < line.length; i++) {
-                    const char = line[i];
-                    if (char === '"' && line[i+1] === '"') { cell += '"'; i++; }
-                    else if (char === '"') { inQuotes = !inQuotes; }
-                    else if (char === ',' && !inQuotes) { result.push(cell.trim()); cell = ''; }
-                    else { cell += char; }
-                }
-                result.push(cell.trim());
-                return result;
-            };
-
-            const headers = parseLine(lines[0]);
-            return lines.slice(1).filter(l => l.trim()).map((line, idx) => {
-                const values = parseLine(line);
-                const obj = {};
-                headers.forEach((h, i) => obj[h] = values[i]);
-                return obj;
-            });
-        }
-
-        async function handleUpload(e) {
+        // --- PARSER CSV INTELIGENTE (SEM UNDEFINED) ---
+        window.processCSV = async (e) => {
             const file = e.target.files[0];
-            if (!file || !state.user) {
-                if(!state.user) alert("ERRO: Faça login primeiro!");
-                return;
-            }
+            if (!file || !state.user) return;
 
-            console.log("📤 Upload: Iniciando processamento de", file.name);
+            logDebug("Lendo CSV: " + file.name);
             document.getElementById('global-overlay').classList.remove('opacity-0', 'pointer-events-none');
-            document.getElementById('login-ui').classList.add('hidden');
-            document.getElementById('status-spinner').classList.add('hidden');
-            document.getElementById('upload-status-ui').classList.remove('hidden');
+            document.getElementById('login-container').classList.add('hidden');
+            document.getElementById('upload-ui').classList.remove('hidden');
             
             const reader = new FileReader();
             reader.onload = async (ev) => {
                 try {
-                    const rawData = parseCSV(ev.target.result);
-                    document.getElementById('upload-progress').style.width = '40%';
+                    const text = ev.target.result;
+                    const lines = text.split(/\r?\n/).filter(l => l.trim());
+                    if (lines.length < 2) throw new Error("Ficheiro vazio ou inválido.");
 
-                    const newList = rawData.map((o, idx) => ({
-                        id: o['dest.id'] || `R-${idx}-${Date.now()}`,
-                        name: o['dest.name'] || 'S/N',
-                        iata: o['dest.iata'] || '???',
-                        country: o['dest.country'] || '-',
-                        dist: parseFloat(o['direct_dist']) || 0,
-                        time: parseFloat(o['time']) || 0,
-                        profit: parseFloat(o['profit_pt']) || 0,
-                        market: o['market'] || '?',
-                        aircraft: file.name.toLowerCase().includes('mc214') ? 'MC-21-400' : 'Avião',
-                        origin: file.name.toLowerCase().includes('jfk') ? 'JFK' : 'HUB',
-                        config: { y: o['cfg.y'] || 0, j: o['cfg.j'] || 0, f: o['cfg.f'] || 0 },
-                        prices: { y: o['tkt.y'] || 0, j: o['tkt.j'] || 0, f: o['tkt.f'] || 0 },
-                        stopover: o['stop.iata'] ? { name: o['stop.name'], iata: o['stop.iata'], country: o['stop.country'] } : null
-                    }));
-
-                    if (new Blob([JSON.stringify(newList)]).size > 1000000) {
-                        throw new Error("Arquivo muito grande. Limite: 1500 rotas.");
-                    }
-
-                    await setDoc(doc(db, 'artifacts', appIdRoot, 'users', state.user.uid, 'data', 'routes'), { list: newList });
-                    console.log("✅ Upload: Malha sincronizada com a nuvem.");
+                    // Helper para colunas
+                    const headers = lines[0].split(',').map(h => h.trim());
+                    const bar = document.getElementById('upload-bar');
                     
-                    document.getElementById('upload-progress').style.width = '100%';
+                    const newList = lines.slice(1).map((line, idx) => {
+                        const vals = line.split(',');
+                        const o = {};
+                        headers.forEach((h, i) => o[h] = vals[i] || ""); // Garantir string vazia se undefined
+
+                        // Mapeamento Seguro
+                        return {
+                            id: o['dest.id'] || `R-${idx}-${Date.now()}`,
+                            name: o['dest.name'] || 'Destino Desconhecido',
+                            iata: o['dest.iata'] || '???',
+                            country: o['dest.country'] || '-',
+                            dist: parseFloat(o['direct_dist']) || 0,
+                            time: parseFloat(o['time']) || 0,
+                            profit: parseFloat(o['profit_pt']) || 0,
+                            aircraft: file.name.toLowerCase().includes('mc214') ? 'MC-21-400' : 'Aeronave',
+                            origin: file.name.toLowerCase().includes('jfk') ? 'JFK' : 'HUB',
+                            config: { y: o['cfg.y'] || 0, j: o['cfg.j'] || 0, f: o['cfg.f'] || 0 },
+                            prices: { y: o['tkt.y'] || 0, j: o['tkt.j'] || 0, f: o['tkt.f'] || 0 },
+                            stopover: o['stop.iata'] ? { name: o['stop.name'] || "", iata: o['stop.iata'] || "" } : null
+                        };
+                    });
+
+                    bar.style.width = '60%';
+                    await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'routes'), { list: newList });
+                    
+                    bar.style.width = '100%';
                     setTimeout(() => {
                         document.getElementById('global-overlay').classList.add('opacity-0', 'pointer-events-none');
-                        document.getElementById('upload-status-ui').classList.add('hidden');
-                    }, 600);
+                        document.getElementById('upload-ui').classList.add('hidden');
+                        logDebug("Sincronização concluída.");
+                    }, 800);
 
                 } catch (err) {
-                    console.error("❌ Upload Error:", err);
-                    alert("FALHA: " + err.message);
-                    document.getElementById('global-overlay').classList.add('opacity-0', 'pointer-events-none');
+                    alert("Falha no Processamento: " + err.message);
+                    location.reload();
                 }
             };
             reader.readAsText(file);
-        }
-
-        // --- RENDERIZAÇÃO ---
-        const formatTime = (hours) => {
-            if (isNaN(hours)) return "0h 0m";
-            const h = Math.floor(hours);
-            const m = Math.round((hours - h) * 60);
-            return `${h}h ${m}m`;
         };
 
+        // --- RENDER ---
         function render() {
             const grid = document.getElementById('routes-grid');
             const filtered = state.routes.filter(r => {
-                const s = r.name.toLowerCase().includes(state.filters.search.toLowerCase()) || r.iata.toLowerCase().includes(state.filters.search.toLowerCase());
-                const u = state.filters.status === 'all' || (state.filters.status === 'used' ? state.status[r.id] : !state.status[r.id]);
-                const a = state.filters.aircraft === 'all' || r.aircraft === state.filters.aircraft;
+                const s = r.name.toLowerCase().includes(state.filters.s.toLowerCase()) || r.iata.toLowerCase().includes(state.filters.s.toLowerCase());
+                const u = state.filters.st === 'all' || (state.filters.st === 'used' ? state.status[r.id] : !state.status[r.id]);
+                const a = state.filters.a === 'all' || r.aircraft === state.filters.a;
                 return s && u && a;
             });
 
-            filtered.sort((a,b) => state.filters.sort === 'profit' ? b.profit - a.profit : b.dist - a.dist);
-            const totalPages = Math.ceil(filtered.length / state.filters.limit) || 1;
-            const paginated = state.filters.limit === 0 ? filtered : filtered.slice((state.filters.page-1)*state.filters.limit, state.filters.page*state.filters.limit);
+            filtered.sort((a,b) => state.filters.o === 'profit' ? b.profit - a.profit : b.dist - a.dist);
+            
+            const totalP = Math.ceil(filtered.length / state.filters.l) || 1;
+            const paginated = state.filters.l === 0 ? filtered : filtered.slice((state.filters.p - 1) * state.filters.l, state.filters.p * state.filters.l);
 
             grid.innerHTML = '';
-            if(state.routes.length === 0) {
-                document.getElementById('empty-state').classList.remove('hidden');
-                document.getElementById('pagination-box').classList.add('hidden');
-            } else {
+            if(state.routes.length === 0) document.getElementById('empty-state').classList.remove('hidden');
+            else {
                 document.getElementById('empty-state').classList.add('hidden');
                 paginated.forEach(r => {
                     const isUsed = state.status[r.id];
                     const card = document.createElement('div');
-                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5 shadow-xl' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 shadow-sm'}`;
+                    card.className = `p-6 rounded-[2.5rem] border-2 transition-all duration-300 ${isUsed ? 'bg-emerald-500/5 border-emerald-500 ring-4 ring-emerald-500/5' : 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'}`;
                     card.innerHTML = `
                         <div class="flex justify-between items-start mb-4">
-                            <div class="flex items-center gap-1.5">
-                                <span class="bg-blue-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.origin}</span>
+                            <div class="flex items-center gap-1.5 font-black text-[8px]">
+                                <span class="bg-blue-600 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.origin}</span>
                                 <i data-lucide="arrow-right" class="w-3 h-3 opacity-30"></i>
-                                <span class="bg-emerald-600 text-white text-[8px] font-black px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.iata}</span>
+                                <span class="bg-emerald-600 text-white px-2 py-0.5 rounded uppercase leading-none pb-1 pt-1">${r.iata}</span>
                             </div>
-                            ${isUsed ? '<span class="text-[8px] font-black text-emerald-600 uppercase bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full animate-pulse">Operando</span>' : ''}
+                            ${isUsed ? '<span class="text-[8px] font-black text-emerald-600 uppercase bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full">Ativo</span>' : ''}
                         </div>
-                        <h3 class="font-black text-lg truncate leading-tight mb-1">${r.name}</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-5">${r.country} • ${r.aircraft}</p>
+                        <h3 class="font-black text-lg truncate mb-1">${r.name}</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-5 tracking-tighter">${r.country} • ${r.aircraft}</p>
                         
                         <div class="grid grid-cols-3 gap-2 mb-6">
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center border border-slate-100 dark:border-slate-800">
@@ -402,7 +329,7 @@
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center border border-slate-100 dark:border-slate-800">
                                 <span class="text-[11px] font-black block">${Math.floor(r.time)}h</span>
-                                <span class="text-[7px] text-slate-400 uppercase font-black">Voo</span>
+                                <span class="text-[7px] text-slate-400 uppercase font-black">Tempo</span>
                             </div>
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl text-center border border-slate-100 dark:border-slate-800">
                                 <span class="text-[11px] font-black text-emerald-600 block">$${Math.round(r.profit/1000)}k</span>
@@ -413,10 +340,7 @@
                         ${r.stopover ? `
                             <div class="mb-6 p-3 bg-amber-500/10 border border-amber-500/20 rounded-2xl flex items-center gap-3">
                                 <div class="bg-amber-500/20 p-2 rounded-xl text-amber-600"><i data-lucide="navigation" class="w-4 h-4"></i></div>
-                                <div class="min-w-0">
-                                    <p class="text-[8px] font-black uppercase text-amber-600">Escala Técnica</p>
-                                    <p class="text-[10px] font-bold dark:text-amber-400 truncate">${r.stopover.name} (${r.stopover.iata})</p>
-                                </div>
+                                <div class="min-w-0"><p class="text-[8px] font-black uppercase text-amber-600">Escala Técnica</p><p class="text-[10px] font-bold dark:text-amber-400 truncate">${r.stopover.name} (${r.stopover.iata})</p></div>
                             </div>
                         ` : ''}
 
@@ -425,46 +349,45 @@
                             <div class="flex justify-between font-bold"><span>Executiva</span><span class="font-black">${r.config.j} @ $${r.prices.j}</span></div>
                         </div>
 
-                        <button class="use-btn w-full py-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all ${isUsed ? 'bg-slate-900 text-white' : 'bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white'} shadow-sm">
-                            ${isUsed ? 'Encerrar Voo' : 'Iniciar Rota'}
+                        <button class="use-btn w-full py-4 rounded-[1.2rem] text-[10px] font-black uppercase tracking-[0.2em] transition-all btn-active ${isUsed ? 'bg-slate-900 text-white shadow-xl' : 'bg-white text-emerald-600 border-2 border-emerald-600 hover:bg-emerald-600 hover:text-white'}">
+                            ${isUsed ? 'Liberar Rota' : 'Iniciar Voo'}
                         </button>
                     `;
-                    card.querySelector('.use-btn').onclick = () => toggleUse(r.id);
+                    card.querySelector('.use-btn').onclick = async () => {
+                        const active = { ...state.status, [r.id]: !state.status[r.id] };
+                        await setDoc(doc(db, 'artifacts', appId, 'users', state.user.uid, 'data', 'status'), { active });
+                    };
                     grid.appendChild(card);
                 });
-                
-                if (state.filters.limit > 0 && totalPages > 1) {
+
+                if (state.filters.l > 0 && totalP > 1) {
                     document.getElementById('pagination-box').classList.remove('hidden');
-                    document.getElementById('page-count').innerText = `Pág ${state.filters.page} de ${totalPages}`;
-                    document.getElementById('prev-btn').disabled = state.filters.page === 1;
-                    document.getElementById('next-btn').disabled = state.filters.page === totalPages;
-                } else {
-                    document.getElementById('pagination-box').classList.add('hidden');
-                }
+                    document.getElementById('page-text').innerText = `Página ${state.filters.p} de ${totalP}`;
+                    document.getElementById('prev-btn').disabled = state.filters.p === 1;
+                    document.getElementById('next-btn').disabled = state.filters.p === totalP;
+                } else document.getElementById('pagination-box').classList.add('hidden');
             }
 
-            document.getElementById('stat-total').innerText = state.routes.length;
+            document.getElementById('stat-count').innerText = state.routes.length;
             document.getElementById('stat-active').innerText = Object.values(state.status).filter(v=>v).length;
-            const totalP = filtered.reduce((acc, curr) => acc + (state.status[curr.id] ? curr.profit : 0), 0);
-            document.getElementById('stat-profit').innerText = `$${totalP.toLocaleString('pt-PT', {maximumFractionDigits:0})}`;
+            const totalPr = filtered.reduce((a,c) => a + (state.status[c.id]?c.profit:0), 0);
+            document.getElementById('stat-profit').innerText = `$${totalPr.toLocaleString('pt-PT', {maximumFractionDigits:0})}`;
             lucide.createIcons();
         }
 
-        function updateOptions() {
+        function updateOpts() {
             const a = document.getElementById('filter-aircraft');
             const airs = ['all', ...new Set(state.routes.map(r => r.aircraft))];
-            a.innerHTML = airs.map(x => `<option value="${x}">${x==='all'?'Todas Aeronaves':x}</option>`).join('');
+            a.innerHTML = airs.map(x => `<option value="${x}">${x==='all'?'Aeronaves':x}</option>`).join('');
         }
 
-        // --- EVENTOS ---
-        document.getElementById('search-input').oninput = (e) => { state.filters.search = e.target.value; state.filters.page=1; render(); };
-        document.getElementById('filter-aircraft').onchange = (e) => { state.filters.aircraft = e.target.value; state.filters.page=1; render(); };
-        document.getElementById('filter-status').onchange = (e) => { state.filters.status = e.target.value; state.filters.page=1; render(); };
-        document.getElementById('sort-by').onchange = (e) => { state.filters.sort = e.target.value; render(); };
-        document.getElementById('items-per-page').onchange = (e) => { state.filters.limit = parseInt(e.target.value); state.filters.page=1; render(); };
-        document.getElementById('prev-btn').onclick = () => { state.filters.page--; window.scrollTo(0, 0); render(); };
-        document.getElementById('next-btn').onclick = () => { state.filters.page++; window.scrollTo(0, 0); render(); };
-        document.getElementById('csv-upload').onchange = handleUpload;
+        document.getElementById('search-input').oninput = (e) => { state.filters.s = e.target.value; state.filters.p=1; render(); };
+        document.getElementById('filter-aircraft').onchange = (e) => { state.filters.a = e.target.value; state.filters.p=1; render(); };
+        document.getElementById('filter-status').onchange = (e) => { state.filters.st = e.target.value; state.filters.p=1; render(); };
+        document.getElementById('sort-by').onchange = (e) => { state.filters.o = e.target.value; render(); };
+        document.getElementById('page-limit').onchange = (e) => { state.filters.l = parseInt(e.target.value); state.filters.p=1; render(); };
+        document.getElementById('prev-btn').onclick = () => { state.filters.p--; window.scrollTo(0,0); render(); };
+        document.getElementById('next-btn').onclick = () => { state.filters.p++; window.scrollTo(0,0); render(); };
 
         lucide.createIcons();
     </script>
