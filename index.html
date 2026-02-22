@@ -229,12 +229,12 @@
         document.getElementById('google-login-btn').onclick = async () => { try { await signInWithPopup(auth, provider); } catch (err) { showError(err.message); } };
         document.getElementById('email-signin-btn').onclick = async () => {
             const email = document.getElementById('email-input').value; const pass = document.getElementById('pass-input').value;
-            if(!email || !pass) return showError("Campos vazios.");
+            if(!email || !pass) return showError("Preencha todos os campos.");
             showAuthView('loading'); try { await signInWithEmailAndPassword(auth, email, pass); } catch (err) { showAuthView('login'); showError("Erro de login."); }
         };
         document.getElementById('email-signup-btn').onclick = async () => {
             const email = document.getElementById('email-input').value; const pass = document.getElementById('pass-input').value;
-            if(!email || !pass) return showError("Campos vazios.");
+            if(!email || !pass) return showError("Preencha todos os campos.");
             if(pass.length < 6) return showError("Mínimo 6 caracteres.");
             showAuthView('loading'); try { await createUserWithEmailAndPassword(auth, email, pass); } catch (err) { showAuthView('login'); showError("Erro ao criar conta."); }
         };
@@ -299,6 +299,8 @@
 
         function render() {
             const grid = document.getElementById('routes-grid');
+            
+            // Faturamento Estimado (Soma todas as utilizadas, mesmo as escondidas por filtros)
             const totalProfit = state.routes.reduce((acc, curr) => acc + (state.status[curr.id] ? curr.profit : 0), 0);
             document.getElementById('stat-profit').innerText = `$${totalProfit.toLocaleString('pt-PT')}`;
 
@@ -346,7 +348,8 @@
                             ${isUsed ? '<span class="text-[8px] font-black text-emerald-600 uppercase bg-emerald-100 dark:bg-emerald-900/30 px-3 py-1 rounded-full animate-pulse shadow-sm">Operando</span>' : ''}
                         </div>
                         <h3 class="font-black text-lg truncate mb-1 pr-10 text-slate-800 dark:text-white">${r.name}</h3>
-                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-5 tracking-tighter">${r.aircraft}</p>
+                        <!-- CORRIGIDO: MOSTRAR PAÍS E AERONAVE -->
+                        <p class="text-[10px] text-slate-400 font-bold uppercase mb-5 tracking-tighter">${r.country} • ${r.aircraft}</p>
                         <div class="grid grid-cols-3 gap-2 mb-6 text-center">
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm"><span class="text-[11px] font-black block">${Math.round(r.dist)}km</span><span class="text-[7px] text-slate-400 uppercase font-black">Dist</span></div>
                             <div class="bg-slate-50 dark:bg-slate-800 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm"><span class="text-[11px] font-black text-emerald-600 block">$${nFormat(r.profit)}</span><span class="text-[7px] text-slate-400 uppercase font-black">Lucro</span></div>
